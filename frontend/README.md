@@ -4,7 +4,19 @@
 
 ## Table of Contents
 
---
+1. [Project Overview](#project-overview)
+2. [Programming Style Guide](#programming-style-guide)
+3. [Technologies Used](#technologies-used)
+4. [Full Technology & Package Reference](#full-technology--package-reference)
+5. [Running the Application](#running-the-application)
+6. [Available Scripts](#available-scripts)
+7. [Deployment](#deployment)
+8. [Future Development Plans](#future-development-plans)
+9. [Contributing](#contributing)
+10. [Contributors](#contributors)
+11. [References](#references)
+
+---
 
 ## Project Overview
 
@@ -79,8 +91,6 @@ To run this app, you need:
 - **Internet connection:** For packages installation and API access
 - **Disk space:** ~500 MB (including dependencies)
 
----
-
 ### Software Requirements
 
 - **Operating System:** Windows, macOS, or Linux
@@ -92,8 +102,6 @@ To run this app, you need:
 - **Testing:** We use Vitest testing framework during development and run on localhost:3000 via Vite
 - **Version Control:** Git (GitHub)
 
----
-
 ### Programming Languages Used
 
 - JavaScript (ES6+)
@@ -101,11 +109,9 @@ To run this app, you need:
 - HTML
 - CSS/Sass
 
----
-
 ### Core Dependencies
 
-### `react`
+#### `react`
 
 - **Industry Relevance:**
   - React has a built-in large ecosystem providing plenty of built-in packages including for features such as for routing and forms and is a widely used front-end library used for building user interface (UI) components, use hooks, manage state and virtual document-object model (DOM).
@@ -127,9 +133,7 @@ To run this app, you need:
 
 - **License:** MIT License
 
----
-
-### `vite`
+#### `vite`
 
 - **Industry Relevance:**
   - Vite is a production bundler and it is an increasingly popular build tool for modern front-end web development due to its speed and efficiency. It is widely adopted in the industry for its leading performance and ability to provide instant dev server startup for a faster development experience. It is used by large leading companies such as Google, Apple and Microsoft.
@@ -149,9 +153,7 @@ To run this app, you need:
 
 - **License:** MIT License
 
----
-
-### `axios`
+#### `axios`
 
 - **Industry Relevance:**
   - Axios is a widely used HTTP client library in the JavaScript ecosystem, and is used by almost every major tech company and is considered the go to standard for HTTP requests. It is well known for its simplicity and ease to use when making API requests, which is why it is a popular option for developers especially when handling asynchronous data fetching. It is commonly used particularly in React applications for its promise-based syntax and built-in features that simplify the process of making HTTP requests. It is a reliable and widely supported by the community with extensive documentation making it a well resourced option for developers to use.
@@ -170,9 +172,7 @@ To run this app, you need:
 
 - **License:** MIT License
 
----
-
-### `@tanstack/react-query`
+#### `@tanstack/react-query`
 
 - **Industry Relevance:**
   - Tanstack React Query is the most widely used React data fetching library and is used by large production applications such as Netflix, Amazon and Microsoft. It is considered as a highly relevant library in the React ecosystem and is considered the best practice for handling server state in Modern React applications.
@@ -192,9 +192,7 @@ To run this app, you need:
 
 - **License:** MIT License
 
----
-
-### `react-modal`
+#### `react-modal`
 
 - **Industry Relevance:**
   - React-modal is one of the most established modal libraries in the React ecosystem known for its accessibility features and ease of use. It has been used and tested in production for many years and is trusted by major companies for its accessibility-compliant modal implementations.
@@ -241,8 +239,6 @@ All technologies and packages are documented below with **industry relevance**, 
 | **`@testing-library/react`** | Component testing                                                | 22M downloads; testing best practice                      | Enzyme (legacy)                        |
 | **`eslint` + `prettier`**    | Linting & formatting                                             | Enforced in 80%+ of JS codebases (State of JS)            | Biome, standardlint                    |
 | **`@vitejs/plugin-react`**   | React Fast Refresh in Vite                                       | Enables HMR                                               | Create React App (deprecated), Webpack |
-
----
 
 ### Third-party Licenses
 
@@ -348,7 +344,7 @@ Back-End: Render [The Reel Canon](https://the-reel-canon.onrender.com/movies/ree
 
 ### Future Development Plans
 
-### Version Pipeline
+#### Version Pipeline
 
 Below is a list of current and future plans for improving functionality and features of this project:
 
@@ -433,7 +429,7 @@ Below is a list of current and future plans for improving functionality and feat
 
 ---
 
-### Contributing
+## Contributing
 
 - **Branching and Forking**: Fork the repository and create feature branches from `main` using descriptive names (`feature/user-auth`, `fix/rating-bug`)
 - **Conventional Commits**: Follow conventional commit format (`feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `test:`, `chore:`) for clear commit history
@@ -450,7 +446,7 @@ Below is a list of current and future plans for improving functionality and feat
 
 ---
 
-### References
+## References
 
 - [State of JavaScript 2024: Front-end Frameworks](https://2024.stateofjs.com/en-US/libraries/front-end-frameworks)
 - [Angular vs React vs Vue: Core Differences | BrowserStack](https://www.browserstack.com/guide/angular-vs-react-vs-vue)
