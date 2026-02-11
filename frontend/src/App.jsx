@@ -8,7 +8,6 @@ import {
   ABOUT,
 } from "./utilities/constants/routes";
 import { Home, UserProfile, Leaderboard, Register, ReelCanon, About } from "./pages";
-import "./styles/App.css";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "./components/common/ErrorFallback";
 
