@@ -14,6 +14,10 @@ export default [
   },
   js.configs.recommended,
   {
+    env: {
+      browser: true,
+      node: true,
+    },
     files: ["**/*.{js,jsx}"],
     plugins: {
       react,
