@@ -12,7 +12,7 @@ permissions:
   # Allowed by default but good to be explicit and follow least privilege
   contents: read
   actions: read
-  checks: write
+  checks: write # Needed to attach test reports as check runs
 
 env:
   # Defining at top level makes available to all jobs. If not needed for all, define at job level
@@ -59,7 +59,8 @@ jobs:
           name: test-reports
           path: test_reports/
 
-      - name: Test Reports are Attached to Workflow Run & PR
+      # Test report is created from existing test reports and attached to check run
+      - name: Check Run Test Reports
         id: test-report
         uses: dorny/test-reporter@v2.5.0
         # Still attach reports if tests fail
@@ -67,22 +68,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Test Reports
-          path: ./test_reports/*.xml
+          path: ./test_reports/*.xml # Uses logs attached by bind mounts in docker-compose.test.yaml
           reporter: java-junit
-          # Only show failed suite and test expanded details
-          list-tests: "failed"
-          use-actions-summary: "false"
-
-      - name: Debug Check Run Creation
-        if: always()
-        run: |
-          echo "URL: ${{ steps.test-report.outputs.url }}"
-          echo "HTML URL: ${{ steps.test-report.outputs.url_html }}"
-          echo "Conclusion: ${{ steps.test-report.outputs.conclusion }}"
-
-          # Query if Check Run actually exists for the PR head SHA
-          curl -L \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/${{ github.repository }}/commits/${{ github.event.workflow_run.head_sha }}/check-runs
+          list-tests: "failed" # Only show failed test expanded details
+          use-actions-summary: "false" # Disable so it's added as a check instead of summary
