@@ -61,5 +61,4 @@ jobs:
           path: ./test_reports/*.xml
           reporter: java-junit
           # Only show failed suite and test expanded details
-          list-suites: "failed"
           list-tests: "failed"
