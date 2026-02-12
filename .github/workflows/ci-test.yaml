@@ -71,6 +71,7 @@ jobs:
           reporter: java-junit
           # Only show failed suite and test expanded details
           list-tests: "failed"
+          use-actions-summary: "false"
 
       - name: Debug Check Run Creation
         if: always()
