@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Test Reports are Attached to Workflow Run & PR
+        id: test-report
         uses: dorny/test-reporter@v2.5.0
         # Still attach reports if tests fail
         if: always()
