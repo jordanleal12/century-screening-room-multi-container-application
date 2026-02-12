@@ -5,6 +5,9 @@ on:
     # Default types are opened, synchronize and reopened
     branches:
       - main
+  push: # Add this temporarily
+    branches:
+      - main
   # Allows manual triggering of the actions workflow from the Actions tab
   workflow_dispatch:
 
@@ -51,9 +54,23 @@ jobs:
         if: always()
         run: docker compose -f docker-compose.test.yaml run --rm frontend-test
 
+      - name: Debug Token Permissions
+        if: always()
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Repo: ${{ github.repository }}"
+          echo "SHA: ${{ github.sha }}"
+          echo "Ref: ${{ github.ref }}"
+          # Test if we can actually query check runs
+          curl -L \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs
+
       # Attach test reports to workflow run and PR (if applicable) for persistent, visible test logs.
       - name: Test Reports are Attached to Workflow Run & PR
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v2.5.0
         # Still attach reports if tests fail
         if: always()
         with:
@@ -62,3 +79,11 @@ jobs:
           reporter: java-junit
           # Only show failed suite and test expanded details
           list-tests: "failed"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Debug Step
+      - name: Check Run URL
+        if: always()
+        run: |
+          echo "Check Run URL: ${{ steps.test-reporter.outputs.url }}"
+          echo "Check Run HTML URL: ${{ steps.test-reporter.outputs.url_html }}"
