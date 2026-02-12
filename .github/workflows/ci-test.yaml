@@ -62,3 +62,11 @@ jobs:
           reporter: java-junit
           # Only show failed suite and test expanded details
           list-tests: "failed"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Debug Step
+      - name: Check Run URL
+        if: always()
+        run: |
+          echo "Check Run URL: ${{ steps.test-reporter.outputs.url }}"
+          echo "Check Run HTML URL: ${{ steps.test-reporter.outputs.url_html }}"
