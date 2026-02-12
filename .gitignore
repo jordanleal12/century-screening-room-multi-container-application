@@ -12,3 +12,4 @@ node_modules/
 # Exclude log files
 *.log
 *.log.*
+test_reports/
