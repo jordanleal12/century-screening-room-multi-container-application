@@ -31,6 +31,7 @@ jobs:
           reporter: java-junit
           # Only show failed suite and test expanded details
           list-tests: "failed"
+          sha: ${{ github.event.workflow_run.head_sha }}
 
       - name: Debug Check Run Creation
         if: always()
