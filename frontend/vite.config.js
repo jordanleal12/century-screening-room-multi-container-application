@@ -17,5 +17,7 @@ export default defineConfig({
     // In CI (Docker), run tests sequentially to avoid resource contention
     // eslint-disable-next-line no-undef
     fileParallelism: process.env.CI !== "true",
+    reporters: ["default", "junit"],
+    outputFile: { junit: process.env.VITEST_JUNIT_OUTPUT || "./test_reports/frontend_report.xml" },
   },
 });
