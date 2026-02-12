@@ -1,0 +1,35 @@
+name: Attach Test Reports to Workflow Run & PR
+
+on:
+  workflow_run:
+    workflows: ["CI Tests"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+jobs:
+  attach_test_reports:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Report Artifacts
+        uses: actions/download-artifact@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: test-reports
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Test Reports are Attached to Workflow Run & PR
+        uses: dorny/test-reporter@v2.5.0
+        # Still attach reports if tests fail
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Test Reports
+          path: ./*.xml
+          reporter: java-junit
+          # Only show failed suite and test expanded details
+          list-tests: "failed"
