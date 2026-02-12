@@ -11,19 +11,22 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - TOKEN_HEADER_KEY=authorization
       - DATABASE_URI=${DATABASE_URI} # Needed for tests injecting real DB URI
+      - DOTENV_CONFIG_QUIET=true # Suppress dotenv output in tests
+      - JEST_JUNIT_OUTPUT_DIR=./test_reports # Specify test report directory
     command: npm test
     volumes:
-      # Bind mounts not needed as no hot reloading in tests, anonymous volume for node_modules only
-      - /app/node_modules
+      - /app/node_modules # Anonymous volume for node_modules ensures fresh install
+      # Bind mount to keep test reports available to host to use with dorny/test-reporter action.
+      - ./test_reports:/app/test_reports
 
   # Frontend Service
   frontend-test:
     build: ./frontend
     container_name: frontend_test_container
     environment:
-      # Tells jest/vitest that tests are running in CI environment, so they exit after running
-      - CI=true
+      - CI=true # Tells jest/vitest tests are running in CI environment, so they exit after running
+      - VITEST_JUNIT_OUTPUT=./test_reports/frontend_report.xml # Specify test report path/name
     command: npm test
     volumes:
-      # Bind mounts not needed as no hot reloading in tests, anonymous volume for node_modules only
-      - /app/node_modules
+      - /app/node_modules # Anonymous volume for node_modules ensures fresh install
+      - ./test_reports:/app/test_reports # Output to previously created bind mount
