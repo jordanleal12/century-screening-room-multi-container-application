@@ -11,6 +11,8 @@ on:
 permissions:
   # Allowed by default but good to be explicit and follow least privilege
   contents: read
+  actions: read
+  checks: write # Needed to update PR status with test results
 
 env:
   # Defining at top level makes available to all jobs. If not needed for all, define at job level
@@ -48,3 +50,13 @@ jobs:
         # Still run frontend tests if backend tests fail
         if: always()
         run: docker compose -f docker-compose.test.yaml run --rm frontend-test
+
+      # Attach test reports to workflow run and PR (if applicable) for persistent, visible test logs.
+      - name: Test Reports are Attached to Workflow Run & PR
+        uses: dorny/test-reporter@v2
+        # Still attach reports if tests fail
+        if: always()
+        with:
+          name: Test Reports
+          path: ./test_reports/*.xml
+          reporter: java-junit
