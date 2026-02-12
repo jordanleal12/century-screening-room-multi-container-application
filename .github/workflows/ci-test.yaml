@@ -11,6 +11,8 @@ on:
 permissions:
   # Allowed by default but good to be explicit and follow least privilege
   contents: read
+  actions: read
+  checks: write
 
 env:
   # Defining at top level makes available to all jobs. If not needed for all, define at job level
@@ -64,9 +66,8 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifact: test-reports
           name: Test Reports
-          path: "test_reports/*.xml"
+          path: ./test_reports/*.xml
           reporter: java-junit
           # Only show failed suite and test expanded details
           list-tests: "failed"
