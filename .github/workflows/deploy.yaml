@@ -78,7 +78,7 @@ jobs:
           environment-variables: |
             [
               {"name": "NODE_ENV", "value": "production"},
-              {"name": "TOKEN_HEADER_KEY", "value": "authorization"},
+              {"name": "TOKEN_HEADER_KEY", "value": "authorization"}
             ]
           secrets: |
             [
