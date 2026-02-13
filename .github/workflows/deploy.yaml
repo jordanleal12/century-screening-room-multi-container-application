@@ -79,16 +79,17 @@ jobs:
             [
               {"name": "NODE_ENV", "value": "production"},
               {"name": "TOKEN_HEADER_KEY", "value": "authorization"},
-              {"name": "DATABASE_URI", "value": "${{ secrets.DATABASE_URI }}"},
-              {"name": "JWT_SECRET_KEY", "value": "${{ secrets.JWT_SECRET_KEY }}"},
-              {"name": "OMDB_API_KEY", "value": "${{ secrets.OMDB_API_KEY }}"}
             ]
-          tags: |
+          secrets: |
             [
-              {"key": "Environment", "value": "production"},
-              {"key": "Application", "value": "reel-canon"},
-              {"key": "Service", "value": "backend"}
-            ]
+              {"name": "DATABASE_URI", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/DATABASE_URI"},
+              {"name": "JWT_SECRET_KEY", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/JWT_SECRET_KEY"},
+              {"name": "OMDB_API_KEY", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/OMDB_API_KEY"}
+              ]
+          tags: |
+            Environment=Production
+            Application=reel-canon
+            Service=Backend
           # Resource configuration
           cpu: "256"
           memory: "1024"
@@ -98,7 +99,7 @@ jobs:
           # Service configuration
           health-check-path: /health
           # Auto scaling configuration
-          min-task-count: 2
+          min-task-count: 1
           max-task-count: 4
           auto-scaling-metric: AVERAGE_CPU
           auto-scaling-target-value: 70
@@ -124,11 +125,9 @@ jobs:
           # Container configuration
           container-port: 80
           tags: |
-            [
-              {"key": "Environment", "value": "production"},
-              {"key": "Application", "value": "reel-canon"},
-              {"key": "Service", "value": "frontend"}
-            ]
+            Environment=Production
+            Application=reel-canon
+            Service=Frontend
           # Resource configuration
           cpu: "256"
           memory: "512"
@@ -137,7 +136,7 @@ jobs:
           security-groups: sg-050a6b8cc7b55051b
           health-check-path: /
           # Auto-scaling configuration
-          min-task-count: 2
+          min-task-count: 1
           max-task-count: 4
           auto-scaling-metric: AVERAGE_CPU
           auto-scaling-target-value: 70
