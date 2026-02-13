@@ -19,6 +19,7 @@ env:
   OMDB_API_KEY: ${{ secrets.OMDB_API_KEY }}
   JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
   DATABASE_URI: ${{ secrets.DATABASE_URI }}
+  COMPOSE_CMD: docker compose -f docker-compose.test.yaml
 
 concurrency:
   # Dynamically assign group name based off current workflow and current ref (PR branch)
@@ -39,17 +40,17 @@ jobs:
 
       # Build images using docker-compose.test.yaml. Separate build and run steps improves debugging
       - name: Build Docker Images Using Test Compose
-        run: docker compose -f docker-compose.test.yaml build
+        run: ${{ env.COMPOSE_CMD }} build
 
       # Run backend container tests
       - name: Run Backend Tests
-        run: docker compose -f docker-compose.test.yaml run --rm backend-test
+        run: ${{ env.COMPOSE_CMD }} run --rm backend-test
 
       # Run frontend container tests
       - name: Run Frontend Tests
         # Still run frontend tests if backend tests fail
         if: always()
-        run: docker compose -f docker-compose.test.yaml run --rm frontend-test
+        run: ${{ env.COMPOSE_CMD }} run --rm frontend-test
 
       # Upload test reports as artifacts for usage with test-reporter action
       - name: Upload Test Report Artifacts
