@@ -14,8 +14,16 @@ permissions:
 jobs:
   build_and_push_to_ECR: # Job ID
     name: Build and Push Images to ECR
-    # Specify container environment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Specify container environment
+    strategy:
+      matrix: # Define matrix with different config for backend and frontend services.
+        # This allows building and pushing in parallel, without repeating duplicate steps
+        service: [backend, frontend]
+        include:
+          - service: backend # Define backend specific variables
+            dockerfile_path: ./backend/Dockerfile ./backend
+          - service: frontend # Define frontend specific variables
+            dockerfile_path: ./frontend/Dockerfile.prod ./frontend
 
     steps:
       # Checkout repository to runner
@@ -53,30 +61,23 @@ jobs:
 
       # Upload tag txt file created from last step as artifact for use in deploy workflow
       - name: Upload Tag Artifact
+        # Only upload once for backend since tag is same for both
+        if: matrix.service == 'backend'
         uses: actions/upload-artifact@v6
         with:
           name: tag
           path: tag.txt
 
-      # Build backend image
-      - name: Build Backend Image
-        # Get ECR registry URL from login and use created tag from tag step
+      # Build service image once for each service in matrix. Separate build and push steps improves debugging
+      - name: Build Service Image
+        # Conditionally add build arg for frontend only. Use matrix variables and step outputs for dynamic values
         run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/reel-canon/backend:${{ steps.create_tags.outputs.tag }} \
-          -f ./backend/Dockerfile ./backend
+          docker build ${{ matrix.service == 'frontend' && format('--build-arg VITE_API_URL=${0}', secrets.BACKEND_URL) || ''}} -t \
+          ${{ steps.login-ecr.outputs.registry }}/${{ vars.SERVICE_NAME }}/${{ matrix.service }}:${{ steps.create_tags.outputs.tag }} \
+          -f ${{ matrix.dockerfile_path }}
 
-      # Push backend image to ECR
-      - name: Push Backend Image to ECR
-        run: docker push ${{ steps.login-ecr.outputs.registry }}/reel-canon/backend:${{ steps.create_tags.outputs.tag }}
-
-      # Build frontend image
-      - name: Build Frontend Image
-        # Get ECR registry URL from login and use created tag from tag step
+      # Push service image to ECR
+      - name: Push Service Image to ECR
         run: |
-          docker build --build-arg VITE_API_URL=${{ secrets.BACKEND_URL }} -t \
-          ${{ steps.login-ecr.outputs.registry }}/reel-canon/frontend:${{ steps.create_tags.outputs.tag }} \
-          -f ./frontend/Dockerfile.prod ./frontend
-
-      # Push frontend image to ECR
-      - name: Push Frontend Image to ECR
-        run: docker push ${{ steps.login-ecr.outputs.registry }}/reel-canon/frontend:${{ steps.create_tags.outputs.tag }}
+          docker push \
+          ${{ steps.login-ecr.outputs.registry }}/${{ vars.SERVICE_NAME }}/${{ matrix.service }}:${{ steps.create_tags.outputs.tag }}
