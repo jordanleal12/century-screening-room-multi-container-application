@@ -72,7 +72,7 @@ jobs:
       - name: Build Service Image
         # Conditionally add build arg for frontend only. Use matrix variables and step outputs for dynamic values
         run: |
-          docker build ${{ matrix.service == 'frontend' && format('--build-arg VITE_API_URL=${0}', secrets.BACKEND_URL) || ''}} -t \
+          docker build ${{ matrix.service == 'frontend' && format('--build-arg VITE_API_URL={0}', secrets.BACKEND_URL) || ''}} -t \
           ${{ steps.login-ecr.outputs.registry }}/${{ vars.SERVICE_NAME }}/${{ matrix.service }}:${{ steps.create_tags.outputs.tag }} \
           -f ${{ matrix.dockerfile_path }}
 
