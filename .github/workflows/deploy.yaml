@@ -24,6 +24,36 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Define matrix with different config for backend and frontend services.
+        # This allows deployment in parallel, without repeating duplicate steps
+        service: [backend, frontend]
+        include:
+          # Define backend specific variables
+          - service: backend
+            container_port: ${{ vars.BACKEND_PORT }}
+            environment-variables: |
+              [
+                {"name": "NODE_ENV", "value": "production"},
+                {"name": "TOKEN_HEADER_KEY", "value": "authorization"}
+              ]
+            secrets: |
+              [
+                {"name": "DATABASE_URI", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/DATABASE_URI"},
+                {"name": "JWT_SECRET_KEY", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/JWT_SECRET_KEY"},
+                {"name": "OMDB_API_KEY", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/OMDB_API_KEY"}
+              ]
+            memory: ${{ vars.BACKEND_MEMORY }}
+            security-groups: ${{ vars.BACKEND_SECURITY_GROUPS }}
+            health-check-path: ${{ vars.BACKEND_HEALTH_CHECK_PATH }}
+          # Define frontend specific variables
+          - service: frontend
+            container_port: ${{ vars.FRONTEND_PORT }}
+            memory: ${{ vars.FRONTEND_MEMORY }}
+            security-groups: ${{ vars.FRONTEND_SECURITY_GROUPS }}
+            health-check-path: ${{ vars.FRONTEND_HEALTH_CHECK_PATH }}
+
     # Only run if manually dispatched or build-and-push workflow succeeded
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
@@ -61,89 +91,42 @@ jobs:
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "Image tag: $TAG"
 
-      # Deploy the backend service using new ecs deploy express action
-      - name: Deploy Backend Service
-        id: deploy-backend
+      # Deploy both services using ECS deploy express action and matrix variables for configuration
+      - name: Deploy Services to ECS
+        id: deploy-service
         uses: aws-actions/amazon-ecs-deploy-express-service@v1
         with:
           # Required inputs
-          service-name: reel-canon-backend-service
-          image: ${{ env.ECR_REGISTRY }}/reel-canon/backend:${{ steps.get_tag.outputs.tag }}
+          service-name: ${{ vars.SERVICE_NAME }}-${{ matrix.service }}-service
+          image: ${{ env.ECR_REGISTRY }}/${{ vars.SERVICE_NAME }}/${{ matrix.service }}:${{ steps.get_tag.outputs.tag }}
           execution-role-arn: ${{ secrets.ECS_EXECUTION_ROLE_ARN }}
           infrastructure-role-arn: ${{ secrets.ECS_INFRASTRUCTURE_ROLE_ARN }}
           # Service identification
-          cluster: reel-canon-cluster
+          cluster: ${{ vars.SERVICE_NAME }}-cluster
           # Container configuration
-          container-port: 5000
-          environment-variables: |
-            [
-              {"name": "NODE_ENV", "value": "production"},
-              {"name": "TOKEN_HEADER_KEY", "value": "authorization"}
-            ]
-          secrets: |
-            [
-              {"name": "DATABASE_URI", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/DATABASE_URI"},
-              {"name": "JWT_SECRET_KEY", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/JWT_SECRET_KEY"},
-              {"name": "OMDB_API_KEY", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/OMDB_API_KEY"}
-              ]
+          container-port: ${{ matrix.container_port }}
+          environment-variables: ${{ matrix.environment-variables }}
+          secrets: ${{ matrix.secrets }}
           tags: |
             Environment=Production
-            Application=reel-canon
-            Service=Backend
+            Application=${{ vars.SERVICE_NAME }}
+            Service=${{ matrix.service }}
           # Resource configuration
-          cpu: "256"
-          memory: "1024"
+          cpu: ${{ vars.CPU }}
+          memory: ${{ matrix.memory }}
           # Network configuration
-          subnets: subnet-00b48d66e1d0e3e98, subnet-04cd9e3545d4d6d49
-          security-groups: sg-01e28f4c6641a99cf
+          subnets: ${{ vars.SUBNETS }}
+          security-groups: ${{ matrix.security-groups }}
           # Service configuration
-          health-check-path: /health
+          health-check-path: ${{ matrix.health-check-path }}
           # Auto scaling configuration
-          min-task-count: 1
-          max-task-count: 4
-          auto-scaling-metric: AVERAGE_CPU
-          auto-scaling-target-value: 70
+          min-task-count: ${{ vars.MIN_TASK_COUNT }}
+          max-task-count: ${{ vars.MAX_TASK_COUNT }}
+          auto-scaling-metric: ${{ vars.AUTO_SCALING_METRIC }}
+          auto-scaling-target-value: ${{ vars.AUTO_SCALING_TARGET }}
 
       # Get backend endpoint
-      - name: Print Backend Endpoint
+      - name: Print Service Endpoints
         run: |
-          echo "Backend successfully deployed!"
-          echo "Backend endpoint: ${{ steps.deploy-backend.outputs.endpoint }}"
-
-      # Deploy the frontend service using new ecs deploy express action
-      - name: Deploy Frontend Service
-        id: deploy-frontend
-        uses: aws-actions/amazon-ecs-deploy-express-service@v1
-        with:
-          # Required inputs
-          service-name: reel-canon-frontend-service
-          image: ${{ env.ECR_REGISTRY }}/reel-canon/frontend:${{ steps.get_tag.outputs.tag }}
-          execution-role-arn: ${{ secrets.ECS_EXECUTION_ROLE_ARN }}
-          infrastructure-role-arn: ${{ secrets.ECS_INFRASTRUCTURE_ROLE_ARN }}
-          # Service identification
-          cluster: reel-canon-cluster
-          # Container configuration
-          container-port: 80
-          tags: |
-            Environment=Production
-            Application=reel-canon
-            Service=Frontend
-          # Resource configuration
-          cpu: "256"
-          memory: "512"
-          # Network configuration
-          subnets: subnet-00b48d66e1d0e3e98, subnet-04cd9e3545d4d6d49
-          security-groups: sg-050a6b8cc7b55051b
-          health-check-path: /
-          # Auto-scaling configuration
-          min-task-count: 1
-          max-task-count: 4
-          auto-scaling-metric: AVERAGE_CPU
-          auto-scaling-target-value: 70
-
-          # Get deployment summary
-      - name: Deployment Summary
-        run: |
-          echo "Deployment completed successfully!"
-          echo "Backend endpoint: ${{ steps.deploy-backend.outputs.endpoint }}"
-          echo "Frontend endpoint: ${{ steps.deploy-frontend.outputs.endpoint }}"
+          echo "${{ matrix.service }} successfully deployed!"
+          echo "${{ matrix.service }} endpoint: ${{ steps.deploy-service.outputs.endpoint }}"
