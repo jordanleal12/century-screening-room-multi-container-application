@@ -85,15 +85,17 @@ flowchart LR
 - **Permissions:** The permissions required for the workflow to function. This workflow uses read permissions for contents and actions, and write permissions for checks (needed by test-reporter action)
 - **Env:** Top level environment variable declarations available to all jobs. OMDB_API_KEY, JWT_SECRET_KEY & DATABASE_URI values are mapped from the values stored as repository github secrets, accessed using the `${{}}` syntax, e.g. `JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}`. The COMPOSE_CMD value is not sensitive and is hardcoded to keep code DRY as it is used many times.
 - **Concurrency:** This determines what happens when multiple concurrent instances of the same workflow are running. In this case, workflows are grouped by ref, cancelling in progress test workflows of the same group. This will prevent multiple unnecessary test workflows running when rapid sequential commits are made to an open PR.
-- **Jobs:** A job is a set of sequential steps that take place on the same runner. In this instance, we only require one job 'Run Tests'. The runner and required steps are listed below:
-  - **Runs_on:** Defines the job runner (VM instance), being ubuntu-latest. Using the latest tag ensures up to date security patches at the OS level of the runner.
+- **Jobs:** A job is a set of sequential steps that take place on the same runner. In this instance, we only require one job 'Run Tests'. The job configuration is listed below:
+  - **_ID:_** 'run_tests'. Used to reference this job.
+  - **_Name:_** 'Run Tests'. Human readable job name displayed in UI.
+  - **_Runs_on:_** Defines the job runner (VM instance), being ubuntu-latest. Using the latest tag ensures up to date security patches at the OS level of the runner.
   - **Steps:**
-    - _Checkout Repo:_ This will use the marketplace checkout action (actions/checkout@v6) to checkout the code from the repository, making it available to the workflow
-    - _Build Docker Images:_ This step will run the command `docker compose -f docker-compose.test.yaml` (defined earlier as env.COMPOSE_CMD) + `build`. The `-f` flag refers to the compose file to be use, and the `build` command builds the images without running the containers. Separating build and run commands steps improves debugging.
-    - _Run Backend Tests:_ Runs the command `env.COMPOSE_CMD` + `run --rm backend-test`. This runs the containers from the images built in the prior step, and the `--rm` flag ensures the container is removed upon test completion
-    - _Run Frontend Tests:_ Identical to the backend test step, with the addition of `if: always()` ensuring frontend tests run even if backend tests fail
-    - _Upload Test Report Artifacts:_ Uses the `actions/upload-artifact@v6` action to attach the test reports outputted from test completion as artifacts in the `./test_reports` folder. This ensures they persist upon workflow completion
-    - _Check Run Test Reports:_ Uses the `dorny/test-reporter@v2.5.0` action to parse the test reports written to the `./test_reports` folder on the runner using a bind mount, and add the results as a formatted check run to the pull request, or job under workflow summary if triggered manually.
+    - **_Checkout Repo:_** This will use the marketplace checkout action (actions/checkout@v6) to checkout the code from the repository, making it available to the workflow
+    - **_Build Docker Images:_** This step will run the command `docker compose -f docker-compose.test.yaml` (defined earlier as env.COMPOSE_CMD) + `build`. The `-f` flag refers to the compose file to be use, and the `build` command builds the images without running the containers. Separating build and run commands steps improves debugging.
+    - **_Run Backend Tests:_** Runs the command `env.COMPOSE_CMD` + `run --rm backend-test`. This runs the containers from the images built in the prior step, and the `--rm` flag ensures the container is removed upon test completion
+    - **_Run Frontend Tests:_** Identical to the backend test step, with the addition of `if: always()` ensuring frontend tests run even if backend tests fail
+    - **_Upload Test Report Artifacts:_** Uses the `actions/upload-artifact@v6` action to attach the test reports outputted from test completion as artifacts in the `./test_reports` folder. This ensures they persist upon workflow completion
+    - **_Check Run Test Reports:_** Uses the `dorny/test-reporter@v2.5.0` action to parse the test reports written to the `./test_reports` folder on the runner using a bind mount, and add the results as a formatted check run to the pull request, or job under workflow summary if triggered manually.
 
 ---
 
@@ -150,23 +152,25 @@ flowchart LR
 
 **This is a breakdown of the syntax and values utilized in this workflow:**
 
-- **Name:** 'CI Tests'. Semantic naming of workflow for easier referencing
-- **On:** Conditions that trigger the workflow. This workflow will trigger on In this case, we will use `push: tags: ["v*"]` and `workflow_dispatch`. The first triggers the workflow when a new repository tag is pushed that starts with 'v', e.g. 'v1.1.2'. The second allows manual triggering of the workflow.
-- **Permission:** This is set to read only as no other permissions are required. This is not needed, as this permission is set by default, but it is good practice to declare workflow permissions explicitly.
-- **Jobs:** A job is a set of sequential steps executed on an individual runner. In this case, the workflow only has a single job with the following attributes:
-  - _Id:_ build_and_push_to_ecr
-  - _Name:_ Build and Push Images to ECR
-  - _Run-On:_ ubuntu-latest
-  - _steps:_ Individual steps will follow below
-    **1. Checkout Repo:** This will use `checkout@v6` action to check the code out of the repository to make it available to the workflow
-    **2. Configure AWS Credentials:** This step configures credentials in the workflow using a previously created IAM user or role (user in this instance) with the appropriate permissions. For a user, it will require: `aws-access-key-id`, `aws-secret-access-key` and `aws-region`, all of which will be stored in GitHub Secrets and made available to the step using context interpolation
-    **3. Login To Amazon ECR:** This will use the credentials to login to the Elastic Container Registry
-    **4. Create Image Tags:** When the workflow is triggered automatically, the repository tag will be fetched from the ref, stripping the 'v' and appending '-prod-' and the first 7 characters of the commit SHA. For example, pushing the tag 'v.1.3.2' to the repository with a commit SHA of 'abc1234567...' will result in a tag of `1.3.2-prod-abc1234`. When manually triggering the workflow, the latest tag is fetched using `git tag`, and the word 'manual' is appended to prevent version conflicts, then the commit SHA - i.e. `1.3.2-manual-prod-abc1234`.
-    **5. Upload Tag Artifact:** As our current workflow and our deploy workflow are separated (to improve debugging), we will upload `tag.txt` as an 'artifact', which is a temporary file/folder which can be shared between workflows in the same repository. This will use the `upload-artifact@v6` action.
-    **6. Build Backend Image:** Here we will build and attach the tag to the backend image. The full image URL, name and tag will be `${{ steps.login-ecr.outputs.registry }}/reel-canon/backend:${{ steps.create_tags.outputs.tag }}`
-    **7. Push Backend Image to ECR:** Using the same full image name and tag shown in the above step, the image will be pushed using `docker push <url:name:tag>`
-    **8. Build Frontend Image:** The same as the build step for the backend with the addition of passing the `VITE_API_URL` as a build argument stored in GitHub Secrets.
-    **9. Push Frontend Image to ECR:** Same as step 8 with reel-canon/frontend in the name instead of backend.
+- **Name:** 'Build and Push Images to ECR'. Semantic naming of workflow for easier referencing
+- **On:** Conditions that trigger the workflow. This workflow triggers on `push: tags: ["v*"]` and `workflow_dispatch`. The first triggers when a new repository tag is pushed that starts with 'v', e.g. 'v1.1.2'. The second allows manual triggering of the workflow.
+- **Permission:** The permissions required for the workflow to function. This workflow uses read permissions only.
+- **Jobs:** A job is a set of sequential steps that take place on the same runner. In this instance, we only require one job 'Build and push to ECR', with job configuration declared below:
+  - **_Id:_** build_and_push_to_ecr
+  - **_Name:_** Build and Push Images to ECR
+  - **_Run-On:_** ubuntu-latest
+  - **_Strategy:_** This job uses a strategy matrix to run multiple job runs from a single job definition, using combinations of variables declared in the matrix.
+    - **_Matrix:_** Where the service variable will be declared.
+      - **_Service:_** '[backend, frontend]'. Matrix variable are declared as an array with the job running once per combination of variable configurations. Since we have one variable with 2 configurations, the job will run twice in parallel.
+      - **_include:_** The unique configuration for each variable configuration. This has a unique dockerfile_path for the frontend and backend service.
+  - **Steps:** Individual steps will follow below, with these steps being executed once per service.
+    **_1. Checkout Repo:_** This will use the marketplace checkout action (actions/checkout@v6) to checkout the code from the repository, making it available to the workflow
+    **_2. Configure AWS Credentials:_** This step configures credentials in the workflow using a previously created IAM user with the appropriate permissions, and the `aws-actions/configure-aws-credentials@v5` action. `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` secret variables are stored in GitHub Secrets and made available to the step using context interpolation.
+    **_3. Login To Amazon ECR:_** T`aws-actions/amazon-ecr-login@v2` action is used to login to the Elastic Container Registry.
+    **_4. Create Image Tags:_** When the workflow is triggered automatically, the repository tag will be fetched from the ref, stripping the 'v' and appending '-prod-' and the first 7 characters of the commit SHA. For example, pushing the tag 'v.1.3.2' to the repository with a commit SHA of 'abc1234567...' will result in a tag of `1.3.2-prod-abc1234`. When manually triggering the workflow, the latest tag is fetched using `git tag`, and the word 'manual' is appended to prevent version conflicts, then the commit SHA - i.e. `1.3.2-manual-prod-abc1234`.
+    **_5. Upload Tag Artifact:_** As our current workflow and our deploy workflow are separated (to improve debugging), `tag.txt` is uploaded an 'artifact', which is a temporary file/folder which can be shared between workflows in the same repository. This will use the `upload-artifact@v6` action. This action only triggers for backend service, preventing duplicate artifact uploading.
+    **_6. Build Service Image:_** Here we build and attach the tag to the service image. The full image URL, name and tag uses interpolation to assign the image tag dynamically, as follows: `${{ steps.login-ecr.outputs.registry }}${{ vars.SERVICE_NAME }}/${{ matrix.service }}:${{ steps.create_tags.outputs.tag }}`
+    **_7. Push Service Image to ECR:_** Using the same full image name and tag shown in the above step, the image will be pushed using `docker push <url:name:tag>`
 
 ---
 
