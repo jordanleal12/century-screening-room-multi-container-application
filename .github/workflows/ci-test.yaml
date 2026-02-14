@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  # Allowed by default but good to be explicit and follow least privilege
+  # Read permissions allowed by default but good to be explicit and follow least privilege
   contents: read
   actions: read
   checks: write # Needed to attach test reports as check runs
@@ -52,7 +52,7 @@ jobs:
         if: always()
         run: ${{ env.COMPOSE_CMD }} run --rm frontend-test
 
-      # Upload test reports as artifacts for usage with test-reporter action
+      # Upload test reports as artifacts to persist after job completion.
       - name: Upload Test Report Artifacts
         uses: actions/upload-artifact@v6
         if: always()
