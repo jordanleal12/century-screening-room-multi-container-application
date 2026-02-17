@@ -78,3 +78,67 @@ _**Result:**_ GitHub Actions: 6 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
 **Overall Result:** GitHub Actions stands as the clear leader, winning or tying for every category for my specific use case.
 
 ---
+
+## Docker/Docker Compose
+
+Within the CI/CD workflows used by this application, Docker (through `Dockerfile` files) is used to containerize the application services, and Docker Compose (through `docker-compose.yaml` files) is used to orchestrate the management of these containers. More specifically it allows the running of the containerized version of this application as a single cohesive whole.
+
+Using Docker and Docker Compose within this application allows us to package applications into a 'single lightweight executables' that define their own consistent runtime, allowing its hosted application or service to run consistently across whatever environment it is run within.
+
+The `ci-tests.yaml` workflow uses `docker-compose.test.yaml` to orchestrate the building and running of the frontend and backend services, referencing `frontend/Dockerfile` and `backend/Dockerfile` as build instructions for each service.
+
+Within the `build-and-push.yaml` workflow, the `backend/Dockerfile` and `frontend/Dockerfile.prod` files are used to build a container image for each service, to be uploaded to ECR and used within ECS as a container blueprint.Below is a flowchart representing the instructions within the frontend `Dockerfile.prod` file:
+
+```mermaid
+---
+config:
+  layout: dagre
+  theme: dark
+---
+flowchart TB
+  L1[Base Build Layer: node 22 alpine] -->
+  L2[Metadata Layer: Set Working Directory] -->
+  L3[Dependency Definition Layer: Copy package*.json] -->
+  L4[Installed Dependencies Layer: npm ci]
+  L5[cont. - Source Code Layer: copy app source code] -->
+  L6[Build Argument Layer: Set VITE_API_URL] -->
+  L7[Environment Variable Layer: Convert arg to env variable]
+  L8[cont. - Build Command Layer: npm run build] -->
+  L9[Base Server Layer: nginx 1.29 alpine] -->
+  L10[Compiled Files Layer: Copy dist files from build stage]
+  L11[cont. - Nginx Config Layer: Set nginx config from config file] -->
+  L12[Metadata Layer: expose port 80] -->
+  L13[Start Server Command Layer: nginx -g daemon off;]
+```
+
+### Why Docker?
+
+Docker is currently the most popular containerization platform, and was used by this application as the only containerization platform I was familiar with. Additionally it was chosen as a way to display competency in the most utilized platform. Podman is also a popular choice with its own respective strengths, which are worth comparing still:
+
+|                                |    **Docker**     |    **Podman**     |
+| :----------------------------: | :---------------: | :---------------: |
+|        **Daemon Based**        |        Yes        |        No         |
+|        **Image Format**        | Docker Image, OCI | Docker Image, OCI |
+|        **Desktop GUI**         |  Docker Desktop   |  Podman Desktop   |
+| **GitHub Actions Integration** |       Great       |       Good        |
+
+**Daemon Based:** The largest difference between the two platforms is Dockers use of a Daemon based architecture, and Podmans Daemonless alternative. The Daemon is responsible for container lifecycle management, starting, stopping and managing running containers, pushing and pulling images from registries, and utilizing host resources. It has the advantage of abstracting complex features like container restarts, and a huge host of community support/documentation. The downside is that it requires root permissions which increase security risks, and that it is a single point of failure. In comparison, Podman directly manages container lifecycle with User level permissions only, cutting out the Daemon middleman. This improves security and spreads points of failures, but can increase complexity for some container management tasks.
+
+**Image Format:** Both platforms offer the ability to utilize both Docker Image and Open Container Initiative (OCI) image formats
+
+**Desktop GUI** Both platforms offer a Graphical User Interface (GUI) desktop application alternative to CLI commands with their own pro's and con's. Docker desktop is more mature, and subsequently more feature rich with greater integration support. However Podman Desktop does not require running of a background Daemon, reducing the application overhead and improving container launch times.
+
+**GitHub Actions Integration:** As the more mature and popular platform, Docker has an advantage in this category with official verified Docker actions, easy layer caching, and extensive documentation. Support for Podman is growing fast, but it still lacks official verified actions and lags behind in documentation and support.
+
+### Why Docker Compose?
+
+Since Docker was chosen as the containerization platform, Docker Compose was a natural choice for container orchestration. It's the most popular integration tool, most seamlessly integrates with Docker, it was a tool I was already familiar with, and is ideal for the basic level orchestration used within this applications CI/CD pipeline. Below I will compare it to the next two most popular orchestration tools, being Podman Compose and Kubernetes:
+
+|                         | **Docker Compose** | **Podman Compose** | **Kubernetes** |
+| :---------------------: | :----------------: | :----------------: | -------------- |
+| **Orchestration Level** |    Single Host     |    Single Host     | Cluster        |
+|    **Configuration**    |    Single File     |    Single File     | Multi-File     |
+
+**Orchestration Level:** Docker Compose and Podman Compose differ wildly in scope compared to Kubernetes for container orchestration. Whereas the first two are designed primarily to orchestrate multi-container applications within a single machine, Kubernetes specializes in orchestration across clusters of multiple machines, potentially thousands. The workflows for this application only require single host container orchestration, making Kubernetes unsuitable.
+
+**Configuration:** Both Docker Compose and Podman Compose are able to define orchestration instructions in a single yaml file. In comparison, Kubernetes requires separate yaml files for each service, networking, storage, configuration, metadata etc. This significantly increases the complexity overhead for a simple application like this one.

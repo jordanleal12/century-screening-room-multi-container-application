@@ -69,7 +69,7 @@ flowchart LR
         N_driver["driver: bridge"]
   end
  subgraph backend_s["backend service"]
-        direction TB
+        direction LR
         B_build["build: ./backend (Dockerfile)"]
         B_ports["ports: 5000-5000"]
         B_env["environment: NODE_ENV=development, etc."]
@@ -77,7 +77,7 @@ flowchart LR
         B_bind["Volumes: Bind mount, Anon volume"]
   end
  subgraph frontend_s["frontend service"]
-        direction TB
+        direction LR
         F_build["Build: ./frontend (Dockerfile)"]
         F_ports["ports: 3000:3000"]
         F_env["environment: REACT_APP_API_URL http://localhost:5000"]
@@ -263,7 +263,7 @@ As mentioned previously, this compose file isn't used in the actual production d
 ---
 config:
   layout: dagre
-  theme: neo-dark
+  theme: dark
 ---
     flowchart LR
     subgraph workflow_config["Workflow Configuration"]
