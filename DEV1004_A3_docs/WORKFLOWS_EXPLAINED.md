@@ -190,7 +190,7 @@ As with the build-and-push workflow, a strategy matrix is used in this workflow 
 
 ![Demonstration of time difference between deploy workflow before and after implementing matrix](images/deploy_matrix_timing.png)
 
-Earlier versions of this workflow had an issue with security The sensitive variables being passed to the application where displayed as plain text within the 'configuration' tab of each service within the AWS console. To rectify this, the values are now stored as secure string parameters within AWS Systems Manager (SSM) Parameter Store. The values displayed in the 'configuration' tab now show only an ARN referencing the secure variables, not the plain text value:
+Earlier versions of this workflow had an issue with security. The sensitive variables being passed to the application where displayed as plain text within the 'configuration' tab of each service within the AWS console. To rectify this, the values are now stored as secure string parameters within AWS Systems Manager (SSM) Parameter Store. The values displayed in the 'configuration' tab now show only an ARN referencing the secure variables, not the plain text value:
 
 ![ARN of SSM parameters referenced in service configuration](images/ssm-parameters.png)
 

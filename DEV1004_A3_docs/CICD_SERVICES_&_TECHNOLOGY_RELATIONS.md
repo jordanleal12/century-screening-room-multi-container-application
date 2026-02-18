@@ -122,7 +122,7 @@ Docker is currently the most popular containerization platform, and was used by 
 |        **Desktop GUI**         |  Docker Desktop   |  Podman Desktop   |
 | **GitHub Actions Integration** |       Great       |       Good        |
 
-**Daemon Based:** The largest difference between the two platforms is Dockers use of a Daemon based architecture, and Podmans Daemonless alternative. The Daemon is responsible for container lifecycle management, starting, stopping and managing running containers, pushing and pulling images from registries, and utilizing host resources. It has the advantage of abstracting complex features like container restarts, and a huge host of community support/documentation. The downside is that it requires root permissions which increase security risks, and that it is a single point of failure. In comparison, Podman directly manages container lifecycle with User level permissions only, cutting out the Daemon middleman. This improves security and spreads points of failures, but can increase complexity for some container management tasks.
+**Daemon Based:** The largest difference between the two platforms is Dockers use of a Daemon based architecture, and Podman's Daemonless alternative. The Daemon is responsible for container lifecycle management, starting, stopping and managing running containers, pushing and pulling images from registries, and utilizing host resources. It has the advantage of abstracting complex features like container restarts, and a huge host of community support/documentation. The downside is that it requires root permissions which increase security risks, and that it is a single point of failure. In comparison, Podman directly manages container lifecycle with User level permissions only, cutting out the Daemon middleman. This improves security and spreads points of failures, but can increase complexity for some container management tasks.
 
 **Image Format:** Both platforms offer the ability to utilize both Docker Image and Open Container Initiative (OCI) image formats
 
@@ -177,5 +177,39 @@ _**Result:**_ Mongo Atlas: 3 | DocumentDB: 0 | OVH Cloud: 2 | Self Managed: 0
 _**Result:**_ Mongo Atlas: 4 | DocumentDB: 0 | OVH Cloud: 2 | Self Managed: 0
 
 **Overall Result:** GitHub Actions stands as the clear leader, winning or tying for every category for my specific use case.
+
+---
+
+## Secret Management
+
+This application makes use of sensitive environment variables and build arguments (known as secrets) within its automation workflows, used by the application and deployment services. This is handled through a combination of GitHub Secrets and the AWS Systems Manager (SSM) Parameter Store.
+
+GitHub Secrets is usually the go-to choice for developers working within GitHub Actions due to its native integration. Key-value pairs are added as either repository secrets (available to all repo workflows) or environment secrets (available to workflows that reference the specified environment within the repo). These secrets can be accessed within the workflow using the secrets context - `${{ secrets.SECRET_NAME }}`, and are redacted by default within workflow logs.
+
+When providing secrets to ECS within the `deploy.yaml` workflow, while using GitHub Secrets these secrets remain secure within the context of the workflow only. Once stored within the service task definitions within ECS, the secrets would be stored as plain text if using GitHub Secrets, viewable by anyone with view access permissions. Usage of SSM Parameter Store secure string parameters solves this issue. These parameters are referenced as an Amazon Resource Name (ARN), meaning that the values passed to the service task definition in ECS are ARN's rather than plain text. These ARN's point to the secure strings which are encrypted using a Key Management Store (KMS) key. By providing KMS decryption permissions to the ECS execution role (the task execution role that grants the ECS agent permissions), this role can decrypt the value of these secure strings, making them available for running tasks.
+
+### Why These Secret Management Tools?
+
+Reference the below table for a comparison between GitHub Secrets, AWS SSM Parameter Store, AWS Secrets Manager, and HashiCorp Vault:
+
+|                                    | **GitHub Secrets** | **AWS Secrets** | **AWS SSM Parameter Store** | **HashiCorp Vault** |
+| :--------------------------------: | :----------------: | :-------------: | :-------------------------: | :-----------------: |
+|           **Free Tier**            |        Yes         |       No        |             Yes             |         Yes         |
+|  **Ease of Use W/GitHub Actions**  |      Easiest       |     Medium      |           Medium            |         Low         |
+| **Redacted by Default in Actions** |        Yes         |       No        |             No              |         No          |
+| **Automatic Rotation Scheduling**  |         No         |       Yes       |             No              |         Yes         |
+|      **Works Outside GitHub**      |         No         |       Yes       |             Yes             |         Yes         |
+
+**Free Tier:** GitHub Secrets, SSM Parameters & HashiCorp Vault are available for free, with no limit on GitHub Secret storage in public repositories. A 10,000 parameter per region per account and 20,000 API call per month limit is applied for SSM Parameters. In comparison, HashiCorp offers a measly 25 secrets on their free tier with auto rotation disabled. AWS Secrets price per secret, per month and per 10,000 API calls.
+
+**Ease of Use with GitHub Actions:** As a native offering to GitHub Actions, GitHub Secrets stands ahead here with extremely simple integration as described under the previous sub-heading. If the value of the secret does not have to be made available directly to jobs within the workflow, usage of AWS Secrets and SSM Parameter Store secure strings is equally simple, simply providing the ARN as a variable, as was done within my `deploy.yaml` workflow to provide the ARN to the ECS task definition. If the value does need to be made available directly to jobs this becomes significantly more complex. AWS roles must be configured with appropriate permissions, requiring configuration of credentials and fetching of secrets through third party actions like the `aws-actions/aws-secretsmanager-get-secrets` action. HashiCorp Vault integration is even more complex, requiring the setup of a vault server and authorization methods.
+
+**Redacted by Default in GitHub Actions:** Only GitHub Secrets are masked automatically within the output of GitHub Action logs, though this comes with a caveat. Normal expected usage of the third party secret managers will configure masking without directly having to configure it within workflows. For example, the previously mentioned `aws-actions/aws-secretsmanager-get-secrets` action automatically calls GitHubs masking command when used.
+
+**Automatic Rotation Scheduling:** For the purpose of my application, this feature was not a consideration as I am not implementing secret rotation due to the scope, scale and lack of stored sensitive user information. However this is still an important security feature that should be considered, with only AWS Secrets and HashiCorp Vault offering this feature by default. Custom scheduled workflows can be used to implement this manually for GitHub actions, and an AWS Lambda function can be scheduled to trigger a rotation to implement this manually for SSM Parameters.
+
+**Works Outside GitHub:** The main limitation of GitHub Secrets and the reason this application also had to implement SSM Parameters, it is the only service compared here unable to be used outside of GitHub.
+
+From the above comparison, GitHub Secrets and AWS SSM Parameter Store where chosen as the only free offerings that could still fill the applications needs. Although SSM Parameters could have been used to handle all the application secrets, the ease of use of GitHub Secrets made it preferable to implement except for the previously described edge case handled by SSM Parameters.
 
 ---
