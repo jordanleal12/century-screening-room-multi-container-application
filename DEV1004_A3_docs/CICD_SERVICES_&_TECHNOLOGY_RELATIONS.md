@@ -142,3 +142,40 @@ Since Docker was chosen as the containerization platform, Docker Compose was a n
 **Orchestration Level:** Docker Compose and Podman Compose differ wildly in scope compared to Kubernetes for container orchestration. Whereas the first two are designed primarily to orchestrate multi-container applications within a single machine, Kubernetes specializes in orchestration across clusters of multiple machines, potentially thousands. The workflows for this application only require single host container orchestration, making Kubernetes unsuitable.
 
 **Configuration:** Both Docker Compose and Podman Compose are able to define orchestration instructions in a single yaml file. In comparison, Kubernetes requires separate yaml files for each service, networking, storage, configuration, metadata etc. This significantly increases the complexity overhead for a simple application like this one.
+
+---
+
+## Mongo Atlas
+
+The application uses Mongo Atlas as a cloud hosted Database as a Service (DBaaS) when deployed. Since this multi container application is a MERN application, it requires a MongoDB native or compatible database service to function. This is the most popular cloud service for MongoDB databases, and for good reason. As a service owned and operated by MongoDB Inc, they have a significant advantage in staying up to date with the latest MongoDB features and integrating effectively.
+
+The backend service integrates to Mongo Atlas using a database connection string accessed as an environment variable called `DATABASE_URI`. Within the `deploy.yaml` automation workflow, this value is provided as a secret to the `aws-actions/amazon-ecs-deploy-express-service` action. From there, it is stored within the backend service configuration and passed to a running task when it is started by ECS, allowing the task to call the URI to connect to the database. This is shown in the below image:
+
+![Database URI displayed as environment variable in backend service task definition](images/database_uri_in_service.png)
+
+### Why Mongo Atlas?
+
+There are alternatives to Mongo Atlas, with choices between other DBaaS options like Amazon DocumentDB and OVH Cloud, or self managed options such as deploying a MongoDB database across EC2 instances or ECS tasks. These options will be compared below:
+
+|                       | **Mongo Atlas** | **Amazon DocumentDB** | **OVH Cloud** | **Self Managed** |
+| :-------------------: | :-------------: | :-------------------: | :-----------: | :--------------: |
+|     **Free Tier**     |       Yes       |          No           |      Yes      |       Yes        |
+|  **Native MongoDB**   |       Yes       |          No           |      Yes      |       Yes        |
+| **Setup Complexity**  |       Low       |        Medium         |      Low      |       High       |
+| **Community Support** |     Strong      |        Medium         |      Low      |       Low        |
+
+**Free Tier:** Both Mongo Atlas and OVH Cloud provide a free tier that operates a database on a single cluster replicated across 3 nodes, with 500MB of storage. Amazon Document DB does not, although AWS offers free credits for new accounts. A self managed service can technically achieve a free tier using free tier only resources on a cloud provider like AWS, such as using t2.micro EC2 instances, though it would be likely to encounter performance bottlenecks compared to the DBaaS free tier offerings.
+_**Result:**_ Mongo Atlas: 1 | DocumentDB: 0 | OVH Cloud: 1 | Self Managed: 0
+
+**Native MongoDB:** All but Amazon DocumentDB utilize native MongoDB servers, with the former providing compatibility through an API. This allows compatibility to MongoDB applications, but not every feature is supported and there can be lag in feature uptake. Although the remaining use native MongoDB, Mongo Atlas still maintains an advantage in this field as a service run by MongoDB. Because of this, Mongo Atlas is the first to feature new MongoDB versions and to support new updates.
+_**Result:**_ Mongo Atlas: 2 | DocumentDB: 0 | OVH Cloud: 1 | Self Managed: 0
+
+**Setup Complexity:** Both Mongo Atlas and OVH Cloud lead in this category through their implementation of public connection strings. In comparison, Amazon DocumentDB is not public facing, requiring networking configuration such as VPC's and security tables. Self managed databases have the most complex setup, especially if trying to match features of the DBaaS options, such as sharding, scaling and replication across nodes.
+_**Result:**_ Mongo Atlas: 3 | DocumentDB: 0 | OVH Cloud: 2 | Self Managed: 0
+
+**Community Support:** As the most popular MongoDB DBaaS, Mongo Atlas leads in this category with a rich offering of documentation and public support like tutorials and forums. Amazon DocumentDB also provides extensive documentation, however this is not specific to MongoDB usage, and it that category it falls short. OVH Cloud is a far less popular offering, lagging behind significantly. There are many tutorials and public support for creating self managed MongoDB database services, but official documentation is lacking.
+_**Result:**_ Mongo Atlas: 4 | DocumentDB: 0 | OVH Cloud: 2 | Self Managed: 0
+
+**Overall Result:** GitHub Actions stands as the clear leader, winning or tying for every category for my specific use case.
+
+---
