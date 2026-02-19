@@ -213,3 +213,63 @@ Reference the below table for a comparison between GitHub Secrets, AWS SSM Param
 From the above comparison, GitHub Secrets and AWS SSM Parameter Store where chosen as the only free offerings that could still fill the applications needs. Although SSM Parameters could have been used to handle all the application secrets, the ease of use of GitHub Secrets made it preferable to implement except for the previously described edge case handled by SSM Parameters.
 
 ---
+
+## Deploying with Amazon Web Services
+
+The automation workflows within this repository push service images to Amazons Elastic Container Registry (ECR) within the `build-and-push.yaml` workflow, as well as configuring and deploying the application to Amazons Elastic Container Express Service (ECS) within the `deploy.yaml` workflow.
+
+The Fargate tasks running within ECS are built from the service container images that have been pushed to ECR, using the latest tagged image.
+
+A detailed overview of the planning and architecture [can be found here](../DEV1004_A1_docs/PLANNING_AND_ARCHITECTURE.md), and below is a diagram representing the application architecture within AWS:
+
+![Full network flow](../DEV1004_A1_docs/images/full-network-flow.png)
+
+1. **Client Sends Request**
+2. **Route Table Routes to Subnet**
+3. **NACL Checks Forwarded Request**
+4. **ALB Security Group Checks Request**
+5. **ALB Forwards Request To Frontend Task**
+6. **Service Level Security Group Checks Request**
+7. **Allocated Task Receives Request**
+8. \- 14\. **Response is Returned to Client**
+
+### Why Amazon ECS?
+
+There are many different available cloud services for deploying containerized applications, both within AWS (e.g. EC2 instances or AWS App Runner) and from other cloud providers (e.g. Google's Cloud Run Service or Azure Container App Service).
+
+When choosing the appropriate deployment platform for this application, my choice was driven not by what was the most cost effective and simplest to configure. I had recently completed AWS's extensive Cloud Practitioner training course, and wished to apply my learning by provisioning an appropriate AWS service for this deployment. As such, within the following comparison, ECS Express Service may not stand out as the most appropriate choice, but for me it was the ideal opportunity to apply my skills regarding networking, security configuration, load balancing and auto-scaling within AWS.
+
+Regardless, we will compare both the objective and subjective pros and cons of alternative deployment platforms:
+
+|                                | **AWS ECS** | **AWS EC2 Instances** | **AWS App Runner** | **Google Cloud Run** | **Azure Container Apps** |
+| :----------------------------: | :---------: | :-------------------: | :----------------: | :------------------: | :----------------------: |
+|         **Free Tier**          |     No      |        1 Year         |         No         |         Yes          |           Yes            |
+|  **Auto-Scaling Complexity**   |     Low     |         High          |        Low         |         Low          |          Medium          |
+|      **Setup Complexity**      |   Medium    |         High          |        Low         |         Low          |          Medium          |
+| **GitHub Actions Integration** |    Easy     |        Medium         |     Very Easy      |      Very Easy       |           Easy           |
+
+**Free Tier:** Cloud Run offers the first 240,000 vCPU seconds free per month, and the first 450,000 GiB seconds free per month of RAM. Azure Container Apps offer the same at 180,000 vCPU seconds and 360,000 GiB seconds. AWS EC2 instances offer 750 hours of t2.micro instances per month, but only within a 12 month time frame. Account credits are offered to new AWS users which can be used for both ECS and App Runner, but this is not technically a free tier.
+
+**Auto-Scaling Setup Complexity:** The ECS Express service offers the ability to automatically configure auto-scaling and the associated networking requirements, reverting to the default VPC if none is provided. In my case I configured my own cluster, VPC, subnets, security groups, NAT Gateway, and route table. This was done to provide greater control over the configuration of my ECS cluster. EC2 Instances offer no automatic configuration of load balancing, with significant networking setup required to implement this. AWS App Runner is the most abstracted service, designed for those with minimal experience deploying containerized applications. As such, auto-scaling is very simple to define with concurrency, min and max size values. Google Cloud Run offers automatic auto scaling with the same values, and Azure Container Apps also offers this automatically, but with more complex configuration than the previous two.
+
+**Setup Complexity:** Every service here apart from EC2 instances can be configured with default settings quite easily. When implementing custom configuration, Cloud Run and App Runner maintain that ease of use while ECS and Azure Container Apps quickly grow in complexity for comparable configuration. At the opposite end of the scale, EC2 instances have the greatest initial and ongoing complexity, requiring configuration of complex networking and permission requirements for even a basic deployment.
+
+**GitHub Actions Integration:** All but AWS App runner offer official verified actions to deploy to their respective services via GitHub Actions, with comprehensive documentation and easy to understand implementation. Although App Runner has no official verified action, there is still comprehensive documentation on AWS explaining the process, which remains relatively simple.
+
+### Why Amazon ECR?
+
+A container registry is required to store the service images that ECS uses to start new service tasks. To parallel industry standards of production deployment, I wished to use a private container repository. As mentioned earlier, I also wished to solidify my skills within AWS, making the AWS Elastic Container Registry the optimal choice. Below I will compare ECR Docker Hub, GitHub Container Registry (GHCR), and Google Artifact Registry:
+
+|                                  | **AWS ECR** | **GitHub Container Registry** | **Google Artifact Registry** | **Docker Hub** |
+| :------------------------------: | :---------: | :---------------------------: | :--------------------------: | :------------: |
+|  **Authentication Within AWS**   |   Simple    |            Complex            |           Complex            |      Yes       |
+| **Cross-Network Latency & Cost** |     Low     |             High              |             High             |      High      |
+|  **GitHub Actions Integration**  |    Easy     |             Easy              |             Easy             |      Easy      |
+
+**Authentication Within AWS:** AWS ECS Service requires authentication to pull a service image from whatever registry it is contained within. For usage with ECR, ECS already has an IAM 'ecs-task-execution' role attached, which grants permission to automatically configure an auth token and use it to pull an image from ECR. In comparison, configuration with the other repository services would require manual creation of registry credentials, stored within a secrets manager and referenced within the ECS task definition, and rotated manually for security.
+
+**Cross Network Latency & Cost:** Whenever network requests have to travel outside of the cloud provider and back in, additional networking costs are incurred within AWS and additional checkpoints increase network latency. This is especially true when the registry and ECS cluster are located within different regions. For this reason, ECR has a distinct advantage, with requests from the ECS cluster able to operate within AWS networks.
+
+**GitHub Actions Integration:** Each of these options excels in this field, with official verified actions available for all. GHCR offers an advantage here however, able to integrate GitHub tokens for extremely easy authentication setup.
+
+---
