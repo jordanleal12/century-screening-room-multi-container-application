@@ -273,3 +273,65 @@ A container registry is required to store the service images that ECS uses to st
 **GitHub Actions Integration:** Each of these options excels in this field, with official verified actions available for all. GHCR offers an advantage here however, able to integrate GitHub tokens for extremely easy authentication setup.
 
 ---
+
+## Marketplace Actions
+
+Within the CI/CD workflows of this application, multiple third party actions from the GitHub Actions Marketplace where used. Below I will list each action used and its purpose within the workflows.
+
+### Official `actions/checkout` Action
+
+**Used in:** `ci-test.yaml`, `build-and-push.yaml`
+
+**Purpose:** Checks out code from the repository, making it accessible to the job within the runner
+
+**Alternatives:** `taiki-e/checkout-action`. Not an official action and far less popular. This version is for those wanting an action not dependent on Node, which is not relevant here.
+
+### Official `actions/upload-artifact` Action
+
+**Used in:** `ci-test.yaml`, `build-and-push.yaml`
+
+**Purpose:** Uploads a file or collection of files produced within a workflow run, making them temporarily available to download or be used by other workflows within the repository. In this repository, this action is used to upload test reports within `ci-test.yaml`, and to upload a txt file containing the semantic service image tag defined within the `build-and-push.yaml` workflow
+
+**Alternatives:** `shallwefootball/upload-s3-action`. For those requiring persistent storage of artifacts, uploading them to a storage bucket like an AWS S3 bucket is a viable alternative. Since permanent storage of artifacts was not required, the ease of use of the artifacts action was picked.
+
+### Official `actions/download-artifact` Action
+
+**Used in:** `deploy.yaml`
+
+**Purpose:** Downloads a file or collection of files previously uploaded by the upload artifact action, making them available to be used by a job within the current runner. In this repository, this action is used to download the tag artifact created in `build-and-push.yaml`, providing it as a configuration input for ECS so the ECS service pulls that image tag from ECR when starting tasks.
+
+**Alternatives:** `joutvhu/download-s3`. If uploading to AWS S3 had been used instead of the upload artifact action, this action allows you to download files from S3.
+
+### Unofficial `dorny/test-reporter` Action
+
+**Used in:** `ci-test.yaml`
+
+**Purpose:** Displays test results from popular testing frameworks and creates a report that's attached as a GitHub Check Run or Job summary. Used in this workflow to display the jest test output from the backend service and the vitest test output from the frontend service as a Check Run attached to pull requests, or job summary when triggered manually.
+
+**Alternatives:** `ctrf-io/github-test-reporter`. A solid alternative with a lot of configuration options, `dorny/test-reporter` was chosen instead as the more popular and mature option with clearer documentation and easy implementation.
+
+### Official `aws-actions/configure-aws-credentials` Action
+
+**Used in:** `build-and-push.yaml`, `deploy.yaml`
+
+**Purpose:** Uses an AWS IAM Role or User to allow specified access to AWS account resources, within the workflow. Within my workflows this uses an access key, secret access key, and aws region variable stored within GitHub Secrets to configure permissions using specifically configured IAM User. Although using a Role here with rotating credentials is more secure and best practices, for the scope and security needs of this application, an IAM User was used instead to simplify this process.
+
+**Alternatives:** `Moulick/configure-multiple-aws-roles`. This action is a wrapper of the official action that allows for configuration of concurrent AWS Roles within the same workflow. As this was not relevant or required for my use case, the original was used.
+
+### Official `aws-actions/amazon-ecr-login` Action
+
+**Used in:** `build-and-push.yaml`
+
+**Purpose:** This action allows logging into and pushing to AWS ECR registries. Within my workflow, this action uses the authentication from the previous step to log into my ECR Private repository, using the output to prefix the image tag and push the service image to the repository.
+
+**Alternatives:** `jwalton/gh-ecr-login`. This action is lacking in documentation, and with the very simple usage of the official action, there was no reason to choose an unofficial alternative.
+
+### Official `aws-actions/amazon-ecs-deploy-express-service` Action
+
+**Used in:** `deploy.yaml`
+
+**Purpose:** Deploys a containerized application to ECS by creating or updating an AWS ECS Express Mode service. This service can abstract the provisioning and management of the underlying infrastructure, such as load balancers and security groups. The specific configuration used and its purpose within this application is [expanded upon here](./WORKFLOWS_EXPLAINED.md#functionality-of-deployyaml-workflow).
+
+**Alternatives:** `aws-actions/amazon-ecs-deploy-task-definition`. This action requires a task definition file to deploy the application to ECS, and as such was forfeited for the simpler and more compatible express service option.
+
+---
