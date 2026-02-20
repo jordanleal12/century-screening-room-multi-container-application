@@ -46,7 +46,9 @@ flowchart LR
 
 ### Why GitHub Actions?
 
-There are multiple automation platforms available to developers, but the one used by this application is GitHub Actions, which makes use of yaml workflow files to execute instructions in 'runners' (a virtual machine instance). It also has an impressive suite of predefined actions available in the GitHub Marketplace, allowing developers to abstract many automation jobs. [According to a 2025 Jetbrains Survey](https://blog.jetbrains.com/teamcity/2025/10/the-state-of-cicd/), GitHub Actions leads in popularity as the CI/CD tool of choice, with the next three being GitLab CI, Jenkins and Azure DevOps Server respectively. The chart below shows a comparison of the options, with each comparison to be expanded on:
+There are multiple automation platforms available to developers, but the one used by this application is GitHub Actions. This CI/CD tool makes use of yaml workflow files to execute instructions in 'runners' (a virtual machine instance). It also has an impressive suite of predefined actions available in the GitHub Marketplace, allowing developers to abstract many automation jobs.
+
+[According to a 2025 Jetbrains Survey](https://blog.jetbrains.com/teamcity/2025/10/the-state-of-cicd/), GitHub Actions leads in popularity as the CI/CD tool of choice, with the next three being GitLab CI, Jenkins and Azure DevOps Server respectively. The chart below shows a comparison of the options, with each comparison to be expanded on:
 
 |                             | **GitHub Actions**  |    **GitLabs CI**     |     **Jenkins**     |    **Azure DevOps**     |
 | :-------------------------: | :-----------------: | :-------------------: | :-----------------: | :---------------------: |
@@ -57,23 +59,45 @@ There are multiple automation platforms available to developers, but the one use
 |  **Cost With Public Repo**  |        Free         | Free, Limited Runners | Infrastructure Cost |     Licencing Cost      |
 |  **Ecosystem Integration**  | Actions Marketplace |    CI/CD Catalogue    |   Jenkins Plugins   | Azure Devops Extensions |
 
-**Control Plane Hosting:** This refers to the hosting of the 'control plane' of the CI/CD tool, being the hardware and software orchestrating the execution of the workflows. This is separate to the 'runner' virtual machine instances that execute specific workflow tasks, with the control plane handling the management of these runners. For the scope of our application, a CI/CD tool offering this as cloud hosted Software as a Service (SaaS) significantly reduces initial setup and ongoing maintenance complexity. Of the 4, only Jenkins does not offer the control plane as SaaS, although some third party providers do offer this as a service.
-_**Result:**_ GitHub Actions: 1 | GitLabs CI: 1 | Jenkins: 0 | Azure Devops: 1
-
-**Runner Hosting:** As mentioned above, a runner is a virtual machine instance that executes workflow tasks within. For the same reason as the control plane hosting, having cloud hosted SaaS runners for our application is desired. Again, Jenkins is the only one which does not offer this.
-_**Result:**_ GitHub Actions: 2 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
-
-**Learning Curve:** This is a comparison of both the base learning curve of these tools, adjusted to consider my familiarity with GitHub as a platform. GitHub Actions is widely considered the easiest learning curve, especially for someone already familiar with the platform. It features an extremely comprehensive suite of documentation, intuitive UI, and extensive community support. On the opposite end of the scale, Jenkins has a significantly steep learning curve, requiring a new user to manage both the hardware and software themselves. Jenkins offers extreme customization, at the expense of ease of use. In second place, GitLabs CI is considered a close second to GitHub Action, but its use of single workflow files for an entire workflow and a less clean workflow syntax keeps it a step behind in learning curve
-_**Result:**_ GitHub Actions: 3 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
-
-**GitHub Repository Integration** This is a slightly unfair but a relevant comparison, as this application already existed on a GitHub Repository. As expected GitHub Actions easily wins here, requiring a simple commit of a workflow to `.github/workflows/` in the repository root. Authentication is also extremely easy to manage with a GitHub Token. GitLabs CI and Azure Devops both require mirroring of the existing repository, and Jenkins requires the complex manual configuration of webhooks.
-_**Result:**_ GitHub Actions: 4 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
-
-**Cost with Public Repository:** Since there are different cost options for public vs private repo's with this application being a public repository, only the cost with public repo's will be compared. Both GitHub Actions and GitLabs CI offer free usage of their control plane service, and free usage of their cloud hosted runners. However, GitLabs CI caps this usage at 400 compute minutes and 10GiB of storage per month. Neither Jenkins nor Azure Devops are able to be used for free, with Azure Devops requiring licencing fees, and Jenkins incurring infrastructure costs for self hosting.
-_**Result:**_ GitHub Actions: 5 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
-
-**Ecosystem Integration:** This refers to the different tools, plugins, templates etc. available to integrate within workflows, offered by the CI/CD tools. Here, GitHub Actions stands ahead with its rapidly growing Actions Marketplace. This ecosystem is open source and hosts over 20,000 actions already, including official actions from verified third party providers like AWS and Google. GitLabs CI's CI/CD catalogue differs by offering reusable components and script templates rather than third party scripts. Azure Devops Extensions Marketplace is more focused on integration across Microsoft services, with a smaller range. Jenkins plugins offer significant customization, but are more complex to manage and fall well short of the amount of actions available on the Actions Marketplace
-_**Result:**_ GitHub Actions: 6 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
+1. **Control Plane Hosting:**
+   This refers to the hosting of the 'control plane' of the CI/CD tool, being the hardware and software orchestrating the execution of the workflows. This is separate to the 'runner' virtual machine instances that execute specific workflow tasks, with the control plane handling the management of these runners.
+   \
+    For the scope of our application, a CI/CD tool offering this as cloud hosted Software as a Service (SaaS) significantly reduces initial setup and ongoing maintenance complexity. Of the 4, only Jenkins does not offer the control plane as SaaS, although some third party providers do offer this as a service.
+   \
+    _**Result:**_ GitHub Actions: 1 | GitLabs CI: 1 | Jenkins: 0 | Azure Devops: 1
+   </br>
+2. **Runner Hosting:**
+   As mentioned above, a runner is a virtual machine instance that executes workflow tasks within. For the same reason as the control plane hosting, having cloud hosted SaaS runners for our application is desired. Again, Jenkins is the only one which does not offer this.
+   \
+    _**Result:**_ GitHub Actions: 2 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
+   </br>
+3. **Learning Curve:**
+   This is a comparison of both the base learning curve of these tools, adjusted to consider my familiarity with GitHub as a platform. GitHub Actions is widely considered the easiest learning curve, especially for someone already familiar with the platform. It features an extremely comprehensive suite of documentation, intuitive UI, and extensive community support.
+   \
+    On the opposite end of the scale, Jenkins has a significantly steep learning curve, requiring a new user to manage both the hardware and software themselves. Jenkins offers extreme customization, at the expense of ease of use. In second place, GitLabs CI is considered a close second to GitHub Actions, but due to its use of single workflow files for entire pipelines, and less clean workflow syntax, its learning curve remains slightly higher.
+   \
+    _**Result:**_ GitHub Actions: 3 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
+   </br>
+4. **GitHub Repository Integration:**
+   This is a slightly unfair but relevant comparison, as this application already existed on a GitHub Repository. As expected, GitHub Actions easily wins here, requiring a simple commit of a workflow to `.github/workflows/` in the repository root. Authentication is also extremely easy to manage with a GitHub Token.
+   \
+    GitLabs CI and Azure Devops both require mirroring of the existing repository, and Jenkins requires the complex manual configuration of webhooks.
+   \
+    _**Result:**_ GitHub Actions: 4 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
+   </br>
+5. **Cost with Public Repository:**
+   Since there are different cost options for public vs private repo's with this application being a public repository, only the cost with public repo's will be compared. Both GitHub Actions and GitLabs CI offer free usage of their control plane service, and free usage of their cloud hosted runners. However, GitLabs CI caps this usage at 400 compute minutes and 10GiB of storage per month.
+   \
+    Neither Jenkins nor Azure Devops are able to be used for free, with Azure Devops requiring licencing fees, and Jenkins incurring infrastructure costs for self hosting.
+   \
+    _**Result:**_ GitHub Actions: 5 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
+   </br>
+6. **Ecosystem Integration:**
+   This refers to the different tools, plugins, templates etc. available to integrate within workflows, offered by the CI/CD tools. Here, GitHub Actions stands ahead with its rapidly growing Actions Marketplace. This ecosystem is open source and hosts over 20,000 actions already, including official actions from verified third party providers like AWS and Google.
+   \
+   GitLabs CI's CI/CD catalogue differs by offering reusable components and script templates rather than third party scripts. Azure Devops Extensions Marketplace is more focused on integration across Microsoft services, with a smaller range. Jenkins plugins offer significant customization, but are more complex to manage and fall well short of the amount of actions available on the Actions Marketplace
+   \
+   _**Result:**_ GitHub Actions: 6 | GitLabs CI: 2 | Jenkins: 0 | Azure Devops: 2
 
 **Overall Result:** GitHub Actions stands as the clear leader, winning or tying for every category for my specific use case.
 
@@ -87,7 +111,9 @@ Using Docker and Docker Compose within this application allows us to package app
 
 The `ci-tests.yaml` workflow uses `docker-compose.test.yaml` to orchestrate the building and running of the frontend and backend services, referencing `frontend/Dockerfile` and `backend/Dockerfile` as build instructions for each service.
 
-Within the `build-and-push.yaml` workflow, the `backend/Dockerfile` and `frontend/Dockerfile.prod` files are used to build a container image for each service, to be uploaded to ECR and used within ECS as a container blueprint.Below is a flowchart representing the instructions within the frontend `Dockerfile.prod` file:
+The 'Run Tests' job executes the `docker compose -f docker-compose.test.yaml build` command, followed by `docker compose -f docker-compose.test.yaml run --rm backend-test` & `docker compose -f docker-compose.test.yaml run --rm frontend-test` to achieve this, passing `docker compose -f docker-compose.test.yaml` as a variable to keep commands DRY.
+
+Within the `build-and-push.yaml` workflow, the `backend/Dockerfile` and `frontend/Dockerfile.prod` files are used to build a container image for each service, to be uploaded to ECR and used within ECS as a container blueprint. Below is a flowchart representing the instructions within the frontend `Dockerfile.prod` file:
 
 ```mermaid
 ---
@@ -113,7 +139,7 @@ flowchart TB
 
 ### Why Docker?
 
-Docker is currently the most popular containerization platform, and was used by this application as the only containerization platform I was familiar with. Additionally it was chosen as a way to display competency in the most utilized platform. Podman is also a popular choice with its own respective strengths, which are worth comparing still:
+Docker is currently the most popular containerization platform, and was used by this application as the only containerization platform I was familiar with. Additionally it was chosen as a way to display competency in the most utilized platform. Podman is also a popular choice with its own respective strengths, and as such will be compared:
 
 |                                |    **Docker**     |    **Podman**     |
 | :----------------------------: | :---------------: | :---------------: |
@@ -122,26 +148,56 @@ Docker is currently the most popular containerization platform, and was used by 
 |        **Desktop GUI**         |  Docker Desktop   |  Podman Desktop   |
 | **GitHub Actions Integration** |       Great       |       Good        |
 
-**Daemon Based:** The largest difference between the two platforms is Dockers use of a Daemon based architecture, and Podman's Daemonless alternative. The Daemon is responsible for container lifecycle management, starting, stopping and managing running containers, pushing and pulling images from registries, and utilizing host resources. It has the advantage of abstracting complex features like container restarts, and a huge host of community support/documentation. The downside is that it requires root permissions which increase security risks, and that it is a single point of failure. In comparison, Podman directly manages container lifecycle with User level permissions only, cutting out the Daemon middleman. This improves security and spreads points of failures, but can increase complexity for some container management tasks.
+1. **Daemon Based:**
+   The largest difference between the two platforms is Docker's use of a Daemon based architecture, and Podman's Daemonless alternative. The Daemon is responsible for container lifecycle management, starting, stopping and managing running containers, pushing and pulling images from registries, and utilizing host resources. It has the advantage of abstracting complex features like container restarts, and a huge host of community support/documentation.
+   \
+    The downside is that it requires root permissions which increase security risks, and that it is a single point of failure. In comparison, Podman directly manages container lifecycle with User level permissions only, cutting out the Daemon middleman. This improves security and spreads points of failures, but can increase complexity for some container management tasks.
+   \
+    **_Result:_** Docker: 0 | Podman: 1
+   </br>
+2. **Image Format:**
+   Both platforms offer the ability to utilize both Docker Image, and Open Container Initiative (OCI) image formats
+   \
+    **_Result:_** Docker: 1 | Podman: 2
+   </br>
+3. **Desktop GUI:**
+   Both platforms offer a Graphical User Interface (GUI) desktop application alternative to CLI commands with their own pro's and con's. Docker desktop is more mature, and subsequently more feature rich with greater integration support. However Podman Desktop does not require running of a background Daemon, reducing the application overhead and improving container launch times.
+   \
+    **_Result:_** Docker: 2 | Podman: 2
+   </br>
+4. **GitHub Actions Integration:**
+   As the more mature and popular platform, Docker has an advantage in this category with official verified Docker actions, easy layer caching, and extensive documentation. Support for Podman is growing fast, but it still lacks official verified actions and lags behind in documentation and support.
+   \
+   **_Result:_** Docker: 3 | Podman: 2
 
-**Image Format:** Both platforms offer the ability to utilize both Docker Image and Open Container Initiative (OCI) image formats
-
-**Desktop GUI** Both platforms offer a Graphical User Interface (GUI) desktop application alternative to CLI commands with their own pro's and con's. Docker desktop is more mature, and subsequently more feature rich with greater integration support. However Podman Desktop does not require running of a background Daemon, reducing the application overhead and improving container launch times.
-
-**GitHub Actions Integration:** As the more mature and popular platform, Docker has an advantage in this category with official verified Docker actions, easy layer caching, and extensive documentation. Support for Podman is growing fast, but it still lacks official verified actions and lags behind in documentation and support.
+**Overall Result:** Podman offers performance and security advantages, but Dockers wide usage, maturity, support and documentation keep it ahead for now.
 
 ### Why Docker Compose?
 
-Since Docker was chosen as the containerization platform, Docker Compose was a natural choice for container orchestration. It's the most popular integration tool, most seamlessly integrates with Docker, it was a tool I was already familiar with, and is ideal for the basic level orchestration used within this applications CI/CD pipeline. Below I will compare it to the next two most popular orchestration tools, being Podman Compose and Kubernetes:
+Since Docker was chosen as the containerization platform, Docker Compose was a natural choice for container orchestration. It's the most popular integration tool and most seamlessly integrates with Docker. As a tool I was already familiar with, it was ideal for the basic level orchestration used within this applications CI/CD pipeline. Below I will compare it to the next two most popular orchestration tools, being Podman Compose and Kubernetes:
 
-|                         | **Docker Compose** | **Podman Compose** | **Kubernetes** |
-| :---------------------: | :----------------: | :----------------: | -------------- |
-| **Orchestration Level** |    Single Host     |    Single Host     | Cluster        |
-|    **Configuration**    |    Single File     |    Single File     | Multi-File     |
+|                          | **Docker Compose** | **Podman Compose** | **Kubernetes** |
+| :----------------------: | :----------------: | :----------------: | :------------: |
+| **Orchestration Level**  |    Single Host     |    Single Host     |    Cluster     |
+|    **Configuration**     |    Single File     |    Single File     |   Multi-File   |
+| **Docker Compatibility** |        Best        |       Great        |      Poor      |
 
-**Orchestration Level:** Docker Compose and Podman Compose differ wildly in scope compared to Kubernetes for container orchestration. Whereas the first two are designed primarily to orchestrate multi-container applications within a single machine, Kubernetes specializes in orchestration across clusters of multiple machines, potentially thousands. The workflows for this application only require single host container orchestration, making Kubernetes unsuitable.
+1. **Orchestration Level:**
+   Docker Compose and Podman Compose differ wildly in scope compared to Kubernetes for container orchestration. Whereas the first two are designed primarily to orchestrate multi-container applications within a single machine, Kubernetes specializes in orchestration across clusters of multiple machines, potentially thousands. The workflows for this application only require single host container orchestration, making Kubernetes unsuitable.
+   \
+    **_Result:_** Docker-Compose: 1 | Podman-Compose: 1 | Kubernetes: 0
+   </br>
+2. **Configuration:**
+   Both Docker Compose and Podman Compose are able to define orchestration instructions in a single yaml file. In comparison, Kubernetes requires separate yaml files for each service, networking, storage, configuration, metadata etc. This significantly increases the complexity overhead for a simple application like this one.
+   \
+   **_Result:_** Docker-Compose: 2 | Podman-Compose: 2 | Kubernetes: 0
+   </br>
+3. **Docker Compatibility:**
+   Although Docker images remain compatible with Kubernetes, Docker as a container runtime has been deprecated. Podman Compose is highly compatible with Docker, but Docker Compose maintains the greatest compatibility as a product of the same company.
+   \
+   **_Result:_** Docker-Compose: 3 | Podman-Compose: 2 | Kubernetes: 0
 
-**Configuration:** Both Docker Compose and Podman Compose are able to define orchestration instructions in a single yaml file. In comparison, Kubernetes requires separate yaml files for each service, networking, storage, configuration, metadata etc. This significantly increases the complexity overhead for a simple application like this one.
+**Overall Result:** For the scope of this application, Kubernetes is unsuitable. Podman Compose remains a very strong competitor, but for maximum compatibility with Docker, Docker Compose stands ahead.
 
 ---
 
@@ -151,7 +207,9 @@ The application uses Mongo Atlas as a cloud hosted Database as a Service (DBaaS)
 
 The backend service integrates to Mongo Atlas using a database connection string accessed as an environment variable called `DATABASE_URI`. Within the `deploy.yaml` automation workflow, this value is provided as a secret to the `aws-actions/amazon-ecs-deploy-express-service` action. From there, it is stored within the backend service configuration and passed to a running task when it is started by ECS, allowing the task to call the URI to connect to the database. This is shown in the below image:
 
-![Database URI displayed as environment variable in backend service task definition](images/database_uri_in_service.png)
+![Database URI displayed as environment variable in backend service task definition](./images/database_uri_in_service.png)
+
+Although backend service tests do not connect to the actual database instance, they still check that a database URI exists and has been made available to the service. As such, `secrets.DATABASE_URI` is defined as a workflow level environment variable, making it available to the backend service tests when run.
 
 ### Why Mongo Atlas?
 
@@ -164,19 +222,28 @@ There are alternatives to Mongo Atlas, with choices between other DBaaS options 
 | **Setup Complexity**  |       Low       |        Medium         |      Low      |       High       |
 | **Community Support** |     Strong      |        Medium         |      Low      |       Low        |
 
-**Free Tier:** Both Mongo Atlas and OVH Cloud provide a free tier that operates a database on a single cluster replicated across 3 nodes, with 500MB of storage. Amazon Document DB does not, although AWS offers free credits for new accounts. A self managed service can technically achieve a free tier using free tier only resources on a cloud provider like AWS, such as using t2.micro EC2 instances, though it would be likely to encounter performance bottlenecks compared to the DBaaS free tier offerings.
-_**Result:**_ Mongo Atlas: 1 | DocumentDB: 0 | OVH Cloud: 1 | Self Managed: 0
+1. **Free Tier:**
+   Both Mongo Atlas and OVH Cloud provide a free tier that operates a database on a single cluster replicated across 3 nodes, with 500MB of storage. Amazon Document DB does not, although AWS offers free credits for new accounts.
+   A self managed service can technically achieve a free tier using free tier only resources on a cloud provider like AWS, such as using t2.micro EC2 instances, though it would be likely to encounter performance bottlenecks compared to the DBaaS free tier offerings.
+   \
+    _**Result:**_ Mongo Atlas: 1 | DocumentDB: 0 | OVH Cloud: 1 | Self Managed: 0
+   </br>
+2. **Native MongoDB:**
+   All but Amazon DocumentDB utilize native MongoDB servers, with the former providing compatibility through an API. This allows compatibility to MongoDB applications, but not every feature is supported and there can be lag in feature uptake. Although the remaining use native MongoDB, Mongo Atlas still maintains an advantage in this field as a service run by MongoDB. Because of this, Mongo Atlas is the first to feature new MongoDB versions and to support new updates.
+   \
+    _**Result:**_ Mongo Atlas: 2 | DocumentDB: 0 | OVH Cloud: 1 | Self Managed: 0
+   </br>
+3. **Setup Complexity:**
+   Both Mongo Atlas and OVH Cloud lead in this category through their implementation of public connection strings. In comparison, Amazon DocumentDB is not public facing, requiring networking configuration such as VPC's and security tables. Self managed databases have the most complex setup, especially if trying to match features of the DBaaS options, such as sharding, scaling and replication across nodes.
+   \
+    _**Result:**_ Mongo Atlas: 3 | DocumentDB: 0 | OVH Cloud: 2 | Self Managed: 0
+   </br>
+4. **Community Support:**
+   As the most popular MongoDB DBaaS, Mongo Atlas leads in this category with a rich offering of documentation and public support like tutorials and forums. Amazon DocumentDB also provides extensive documentation, however this is not specific to MongoDB usage, and it that category it falls short. OVH Cloud is a far less popular offering, lagging behind significantly. There are many tutorials and public support for creating self managed MongoDB database services, but official documentation is lacking.
+   \
+   _**Result:**_ Mongo Atlas: 4 | DocumentDB: 0 | OVH Cloud: 2 | Self Managed: 0
 
-**Native MongoDB:** All but Amazon DocumentDB utilize native MongoDB servers, with the former providing compatibility through an API. This allows compatibility to MongoDB applications, but not every feature is supported and there can be lag in feature uptake. Although the remaining use native MongoDB, Mongo Atlas still maintains an advantage in this field as a service run by MongoDB. Because of this, Mongo Atlas is the first to feature new MongoDB versions and to support new updates.
-_**Result:**_ Mongo Atlas: 2 | DocumentDB: 0 | OVH Cloud: 1 | Self Managed: 0
-
-**Setup Complexity:** Both Mongo Atlas and OVH Cloud lead in this category through their implementation of public connection strings. In comparison, Amazon DocumentDB is not public facing, requiring networking configuration such as VPC's and security tables. Self managed databases have the most complex setup, especially if trying to match features of the DBaaS options, such as sharding, scaling and replication across nodes.
-_**Result:**_ Mongo Atlas: 3 | DocumentDB: 0 | OVH Cloud: 2 | Self Managed: 0
-
-**Community Support:** As the most popular MongoDB DBaaS, Mongo Atlas leads in this category with a rich offering of documentation and public support like tutorials and forums. Amazon DocumentDB also provides extensive documentation, however this is not specific to MongoDB usage, and it that category it falls short. OVH Cloud is a far less popular offering, lagging behind significantly. There are many tutorials and public support for creating self managed MongoDB database services, but official documentation is lacking.
-_**Result:**_ Mongo Atlas: 4 | DocumentDB: 0 | OVH Cloud: 2 | Self Managed: 0
-
-**Overall Result:** GitHub Actions stands as the clear leader, winning or tying for every category for my specific use case.
+**Overall Result:** Mongo Atlas takes a strong lead with its popularity, support and in house MongoDB compatibility.
 
 ---
 
@@ -184,7 +251,9 @@ _**Result:**_ Mongo Atlas: 4 | DocumentDB: 0 | OVH Cloud: 2 | Self Managed: 0
 
 This application makes use of sensitive environment variables and build arguments (known as secrets) within its automation workflows, used by the application and deployment services. This is handled through a combination of GitHub Secrets and the AWS Systems Manager (SSM) Parameter Store.
 
-GitHub Secrets is usually the go-to choice for developers working within GitHub Actions due to its native integration. Key-value pairs are added as either repository secrets (available to all repo workflows) or environment secrets (available to workflows that reference the specified environment within the repo). These secrets can be accessed within the workflow using the secrets context - `${{ secrets.SECRET_NAME }}`, and are redacted by default within workflow logs.
+GitHub Secrets is usually the go-to choice for developers working within GitHub Actions due to its native integration. Key-value pairs are added as either repository secrets (available to all repo workflows) or environment secrets (available to workflows that reference the specified environment within the repo). These secrets can be accessed within the workflow using the secrets context - `${{ secrets.SECRET_NAME }}`, and are redacted by default within workflow logs. A full list of repository secrets used is shown below:
+
+![Full list of repository secrets used within the GitHub Repository](./images/repository_secrets.png)
 
 When providing secrets to ECS within the `deploy.yaml` workflow, while using GitHub Secrets these secrets remain secure within the context of the workflow only. Once stored within the service task definitions within ECS, the secrets would be stored as plain text if using GitHub Secrets, viewable by anyone with view access permissions. Usage of SSM Parameter Store secure string parameters solves this issue. These parameters are referenced as an Amazon Resource Name (ARN), meaning that the values passed to the service task definition in ECS are ARN's rather than plain text. These ARN's point to the secure strings which are encrypted using a Key Management Store (KMS) key. By providing KMS decryption permissions to the ECS execution role (the task execution role that grants the ECS agent permissions), this role can decrypt the value of these secure strings, making them available for running tasks.
 
@@ -200,25 +269,42 @@ Reference the below table for a comparison between GitHub Secrets, AWS SSM Param
 | **Automatic Rotation Scheduling**  |         No         |       Yes       |             No              |         Yes         |
 |      **Works Outside GitHub**      |         No         |       Yes       |             Yes             |         Yes         |
 
-**Free Tier:** GitHub Secrets, SSM Parameters & HashiCorp Vault are available for free, with no limit on GitHub Secret storage in public repositories. A 10,000 parameter per region per account and 20,000 API call per month limit is applied for SSM Parameters. In comparison, HashiCorp offers a measly 25 secrets on their free tier with auto rotation disabled. AWS Secrets price per secret, per month and per 10,000 API calls.
+1. **Free Tier:**
+   GitHub Secrets, SSM Parameters & HashiCorp Vault are available for free, with no limit on GitHub Secret storage in public repositories. A 10,000 parameter per region per account and 20,000 API call per month limit is applied for SSM Parameters. In comparison, HashiCorp offers a measly 25 secrets on their free tier with auto rotation disabled. AWS Secrets price per secret, per month and per 10,000 API calls.
+   \
+    _**Result:**_ GitHub Secrets: 1 | AWS Secrets: 0 | AWS SSM Parameter Store: 0 | HashiCorp Vault: 0
+   </br>
+2. **Ease of Use with GitHub Actions:**
+   As a native offering to GitHub Actions, GitHub Secrets stands ahead here with extremely simple integration as described under the previous sub-heading. If the value of the secret does not have to be made available directly to jobs within the workflow, usage of AWS Secrets and SSM Parameter Store secure strings is equally simple, simply providing the ARN as a variable, as was done within my `deploy.yaml` workflow to provide the ARN to the ECS task definition.
+   \
+    If the value does need to be made available directly to jobs this becomes significantly more complex. AWS roles must be configured with appropriate permissions, requiring configuration of credentials and fetching of secrets through third party actions like the `aws-actions/aws-secretsmanager-get-secrets` action. HashiCorp Vault integration is even more complex, requiring the setup of a vault server and authorization methods.
+   \
+   _**Result:**_ GitHub Secrets: 2 | AWS Secrets: 0 | AWS SSM Parameter Store: 0 | HashiCorp Vault: 0
+   </br>
+3. **Redacted by Default in GitHub Actions:**
+   Only GitHub Secrets are masked automatically within the output of GitHub Action logs, though this comes with a caveat. Normal expected usage of the third party secret managers will configure masking without directly having to configure it within workflows. For example, the previously mentioned `aws-actions/aws-secretsmanager-get-secrets` action automatically calls GitHubs masking command when used.
+   \
+    _**Result:**_ GitHub Secrets: 3 | AWS Secrets: 0 | AWS SSM Parameter Store: 0 | HashiCorp Vault: 0
+   </br>
+4. **Automatic Rotation Scheduling:**
+   For the purpose of my application, this feature was not a consideration as I am not implementing secret rotation due to the scope, scale and lack of stored sensitive user information. However this is still an important security feature that should be considered, with only AWS Secrets and HashiCorp Vault offering this feature by default. Custom scheduled workflows can be used to implement this manually for GitHub actions, and an AWS Lambda function can be scheduled to trigger a rotation to implement this manually for SSM Parameters.
+   \
+    _**Result:**_ GitHub Secrets: 3 | AWS Secrets: 1 | AWS SSM Parameter Store: 0 | HashiCorp Vault: 1
+   </br>
+5. **Works Outside GitHub:**
+   The main limitation of GitHub Secrets and the reason this application also had to implement SSM Parameters, it is the only service compared here unable to be used outside of GitHub.
+   \
+   _**Result:**_ GitHub Secrets: 3 | AWS Secrets: 2 | AWS SSM Parameter Store: 1 | HashiCorp Vault: 2
 
-**Ease of Use with GitHub Actions:** As a native offering to GitHub Actions, GitHub Secrets stands ahead here with extremely simple integration as described under the previous sub-heading. If the value of the secret does not have to be made available directly to jobs within the workflow, usage of AWS Secrets and SSM Parameter Store secure strings is equally simple, simply providing the ARN as a variable, as was done within my `deploy.yaml` workflow to provide the ARN to the ECS task definition. If the value does need to be made available directly to jobs this becomes significantly more complex. AWS roles must be configured with appropriate permissions, requiring configuration of credentials and fetching of secrets through third party actions like the `aws-actions/aws-secretsmanager-get-secrets` action. HashiCorp Vault integration is even more complex, requiring the setup of a vault server and authorization methods.
-
-**Redacted by Default in GitHub Actions:** Only GitHub Secrets are masked automatically within the output of GitHub Action logs, though this comes with a caveat. Normal expected usage of the third party secret managers will configure masking without directly having to configure it within workflows. For example, the previously mentioned `aws-actions/aws-secretsmanager-get-secrets` action automatically calls GitHubs masking command when used.
-
-**Automatic Rotation Scheduling:** For the purpose of my application, this feature was not a consideration as I am not implementing secret rotation due to the scope, scale and lack of stored sensitive user information. However this is still an important security feature that should be considered, with only AWS Secrets and HashiCorp Vault offering this feature by default. Custom scheduled workflows can be used to implement this manually for GitHub actions, and an AWS Lambda function can be scheduled to trigger a rotation to implement this manually for SSM Parameters.
-
-**Works Outside GitHub:** The main limitation of GitHub Secrets and the reason this application also had to implement SSM Parameters, it is the only service compared here unable to be used outside of GitHub.
-
-From the above comparison, GitHub Secrets and AWS SSM Parameter Store where chosen as the only free offerings that could still fill the applications needs. Although SSM Parameters could have been used to handle all the application secrets, the ease of use of GitHub Secrets made it preferable to implement except for the previously described edge case handled by SSM Parameters.
+**Overall Result:** GitHub Secrets and AWS SSM Parameter Store where chosen as the only free offerings that could still fill the applications needs. Although SSM Parameters could have been used to handle all the application secrets, the ease of use of GitHub Secrets made it preferable to implement except for the previously described edge case handled by SSM Parameters.
 
 ---
 
 ## Deploying with Amazon Web Services
 
-The automation workflows within this repository push service images to Amazons Elastic Container Registry (ECR) within the `build-and-push.yaml` workflow, as well as configuring and deploying the application to Amazons Elastic Container Express Service (ECS) within the `deploy.yaml` workflow.
+Application service images are pushed to Amazons Elastic Container Registry (ECR) within the `build-and-push.yaml` workflow, and configuring and deploying the application to Amazons Elastic Container Express Service (ECS) occurs within the `deploy.yaml` workflow.
 
-The Fargate tasks running within ECS are built from the service container images that have been pushed to ECR, using the latest tagged image.
+The Fargate tasks running within ECS are built from the service container images that have been pushed to ECR, using the latest pushed image.
 
 A detailed overview of the planning and architecture [can be found here](../DEV1004_A1_docs/PLANNING_AND_ARCHITECTURE.md), and below is a diagram representing the application architecture within AWS:
 
@@ -235,9 +321,9 @@ A detailed overview of the planning and architecture [can be found here](../DEV1
 
 ### Why Amazon ECS?
 
-There are many different available cloud services for deploying containerized applications, both within AWS (e.g. EC2 instances or AWS App Runner) and from other cloud providers (e.g. Google's Cloud Run Service or Azure Container App Service).
+There are many different available cloud services for deploying containerized applications, both within AWS (e.g. EC2 instances or AWS App Runner) or from other cloud providers (e.g. Google's Cloud Run Service or Azure Container App Service).
 
-When choosing the appropriate deployment platform for this application, my choice was driven not by what was the most cost effective and simplest to configure. I had recently completed AWS's extensive Cloud Practitioner training course, and wished to apply my learning by provisioning an appropriate AWS service for this deployment. As such, within the following comparison, ECS Express Service may not stand out as the most appropriate choice, but for me it was the ideal opportunity to apply my skills regarding networking, security configuration, load balancing and auto-scaling within AWS.
+When choosing the appropriate deployment platform for this application, my choice was not driven by what was the most cost effective and simplest to configure. Rather, I had recently completed AWS's extensive Cloud Practitioner training course, and wished to apply my learning by provisioning an appropriate AWS service for this deployment. As such, within the following comparison, ECS Express Service may not stand out as the most appropriate choice, but for me it was the ideal opportunity to apply my skills regarding networking, security configuration, load balancing and auto-scaling within AWS.
 
 Regardless, we will compare both the objective and subjective pros and cons of alternative deployment platforms:
 
@@ -248,13 +334,29 @@ Regardless, we will compare both the objective and subjective pros and cons of a
 |      **Setup Complexity**      |   Medium    |         High          |        Low         |         Low          |          Medium          |
 | **GitHub Actions Integration** |    Easy     |        Medium         |     Very Easy      |      Very Easy       |           Easy           |
 
-**Free Tier:** Cloud Run offers the first 240,000 vCPU seconds free per month, and the first 450,000 GiB seconds free per month of RAM. Azure Container Apps offer the same at 180,000 vCPU seconds and 360,000 GiB seconds. AWS EC2 instances offer 750 hours of t2.micro instances per month, but only within a 12 month time frame. Account credits are offered to new AWS users which can be used for both ECS and App Runner, but this is not technically a free tier.
+1. **Free Tier:**
+   Cloud Run offers the first 240,000 vCPU seconds, and the first 450,000 GiB seconds of RAM free per month. Azure Container Apps offer the same at 180,000 vCPU seconds and 360,000 GiB seconds. AWS EC2 instances offer 750 hours of t2.micro instances per month, but only within a 12 month time frame. Account credits are offered to new AWS users which can be used for both ECS and App Runner, but this is not technically a free tier.
+   \
+    _**Result:**_ ECS: 0 | EC2 Instances: 0 | App Runner: 0 | Google Cloud Run: 1 | Container Apps: 0
+   </br>
+2. **Auto-Scaling Setup Complexity:**
+   The ECS Express service offers the ability to automatically configure auto-scaling and the associated networking requirements, reverting to the default VPC if none is provided. In my case I configured my own cluster, VPC, subnets, security groups, NAT Gateway, and route table. This was done to provide greater control over the configuration of my ECS cluster.
+   \
+    EC2 Instances offer no automatic configuration of load balancing, with significant networking setup required to implement this. AWS App Runner is the most abstracted service, designed for those with minimal experience deploying containerized applications. As such, auto-scaling is very simple to define with concurrency, min and max size values. Google Cloud Run offers automatic auto scaling with the same values, and Azure Container Apps also offers this automatically, but with more complex configuration than the previous two.
+   \
+    _**Result:**_ ECS: 0 | EC2 Instances: 0 | App Runner: 1 | Google Cloud Run: 2 | Container Apps: 0
+   </br>
+3. **Setup Complexity:**
+   Every service here apart from EC2 instances can be configured with default settings quite easily. When implementing custom configuration, Cloud Run and App Runner maintain that ease of use while ECS and Azure Container Apps quickly grow in complexity for comparable configuration. At the opposite end of the scale, EC2 instances have the greatest initial and ongoing complexity, requiring configuration of complex networking and permission requirements for even a basic deployment.
+   \
+    _**Result:**_ ECS: 0 | EC2 Instances: 0 | App Runner: 1 | Google Cloud Run: 3 | Container Apps: 0
+   </br>
+4. **GitHub Actions Integration:**
+   All but AWS App runner offer official verified actions to deploy to their respective services via GitHub Actions, with comprehensive documentation and easy to understand implementation. Although App Runner has no official verified action, there is still comprehensive documentation on AWS explaining the process, which remains relatively simple.
+   \
+   _**Result:**_ ECS: 1 | EC2 Instances: 1 | App Runner: 1 | Google Cloud Run: 4 | Container Apps: 1
 
-**Auto-Scaling Setup Complexity:** The ECS Express service offers the ability to automatically configure auto-scaling and the associated networking requirements, reverting to the default VPC if none is provided. In my case I configured my own cluster, VPC, subnets, security groups, NAT Gateway, and route table. This was done to provide greater control over the configuration of my ECS cluster. EC2 Instances offer no automatic configuration of load balancing, with significant networking setup required to implement this. AWS App Runner is the most abstracted service, designed for those with minimal experience deploying containerized applications. As such, auto-scaling is very simple to define with concurrency, min and max size values. Google Cloud Run offers automatic auto scaling with the same values, and Azure Container Apps also offers this automatically, but with more complex configuration than the previous two.
-
-**Setup Complexity:** Every service here apart from EC2 instances can be configured with default settings quite easily. When implementing custom configuration, Cloud Run and App Runner maintain that ease of use while ECS and Azure Container Apps quickly grow in complexity for comparable configuration. At the opposite end of the scale, EC2 instances have the greatest initial and ongoing complexity, requiring configuration of complex networking and permission requirements for even a basic deployment.
-
-**GitHub Actions Integration:** All but AWS App runner offer official verified actions to deploy to their respective services via GitHub Actions, with comprehensive documentation and easy to understand implementation. Although App Runner has no official verified action, there is still comprehensive documentation on AWS explaining the process, which remains relatively simple.
+**Overall Result:** For an objective view, Google Cloud Run wins here. As previously mentioned, ECS was chosen to improve my skills within AWS rather than the most appropriate choice.
 
 ### Why Amazon ECR?
 
@@ -266,11 +368,22 @@ A container registry is required to store the service images that ECS uses to st
 | **Cross-Network Latency & Cost** |     Low     |             High              |             High             |      High      |
 |  **GitHub Actions Integration**  |    Easy     |             Easy              |             Easy             |      Easy      |
 
-**Authentication Within AWS:** AWS ECS Service requires authentication to pull a service image from whatever registry it is contained within. For usage with ECR, ECS already has an IAM 'ecs-task-execution' role attached, which grants permission to automatically configure an auth token and use it to pull an image from ECR. In comparison, configuration with the other repository services would require manual creation of registry credentials, stored within a secrets manager and referenced within the ECS task definition, and rotated manually for security.
+1. **Authentication Within AWS:**
+   AWS ECS Service requires authentication to pull a service image from whatever registry it is contained within. For usage with ECR, ECS already has an IAM 'ecs-task-execution' role attached, which grants permission to automatically configure an auth token and use it to pull an image from ECR. In comparison, configuration with the other repository services would require manual creation of registry credentials, stored within a secrets manager and referenced within the ECS task definition, and rotated manually for security.
+   \
+    _**Result:**_ ECR: 1 | GHCR: 0 | Google Artifact Registry: 0 | Docker Hub: 0
+   </br>
+2. **Cross Network Latency & Cost:**
+   Whenever network requests have to travel outside of the cloud provider and back in, additional networking costs are incurred within AWS, and additional checkpoints increase network latency. This is especially true when the registry and ECS cluster are located within different regions. For this reason, ECR has a distinct advantage, with requests from the ECS cluster able to stay within AWS networks.
+   \
+    _**Result:**_ ECR: 2 | GHCR: 0 | Google Artifact Registry: 0 | Docker Hub: 0
+   </br>
+3. **GitHub Actions Integration:**
+   Each of these options excels in this field, with official verified actions available for all. GHCR offers an advantage here however, able to integrate GitHub tokens for extremely easy authentication setup.
+   \
+   _**Result:**_ ECR: 2 | GHCR: 1 | Google Artifact Registry: 0 | Docker Hub: 0
 
-**Cross Network Latency & Cost:** Whenever network requests have to travel outside of the cloud provider and back in, additional networking costs are incurred within AWS and additional checkpoints increase network latency. This is especially true when the registry and ECS cluster are located within different regions. For this reason, ECR has a distinct advantage, with requests from the ECS cluster able to operate within AWS networks.
-
-**GitHub Actions Integration:** Each of these options excels in this field, with official verified actions available for all. GHCR offers an advantage here however, able to integrate GitHub tokens for extremely easy authentication setup.
+**Overall Result:** Thanks to its compatibility with other AWS services, ECR is the best choice here.
 
 ---
 
@@ -278,7 +391,7 @@ A container registry is required to store the service images that ECS uses to st
 
 Within the CI/CD workflows of this application, multiple third party actions from the GitHub Actions Marketplace where used. Below I will list each action used and its purpose within the workflows.
 
-### Official `actions/checkout` Action
+### 1. Official `actions/checkout` Action
 
 **Used in:** `ci-test.yaml`, `build-and-push.yaml`
 
@@ -286,23 +399,23 @@ Within the CI/CD workflows of this application, multiple third party actions fro
 
 **Alternatives:** `taiki-e/checkout-action`. Not an official action and far less popular. This version is for those wanting an action not dependent on Node, which is not relevant here.
 
-### Official `actions/upload-artifact` Action
+### 2. Official `actions/upload-artifact` Action
 
 **Used in:** `ci-test.yaml`, `build-and-push.yaml`
 
-**Purpose:** Uploads a file or collection of files produced within a workflow run, making them temporarily available to download or be used by other workflows within the repository. In this repository, this action is used to upload test reports within `ci-test.yaml`, and to upload a txt file containing the semantic service image tag defined within the `build-and-push.yaml` workflow
+**Purpose:** Uploads a file or collection of files produced within a workflow run, making them temporarily available to download, or to be used by other workflows within the repository. In this repository, this action is used to upload test reports within `ci-test.yaml`, and to upload a txt file containing the semantic service image tag defined within the `build-and-push.yaml` workflow.
 
 **Alternatives:** `shallwefootball/upload-s3-action`. For those requiring persistent storage of artifacts, uploading them to a storage bucket like an AWS S3 bucket is a viable alternative. Since permanent storage of artifacts was not required, the ease of use of the artifacts action was picked.
 
-### Official `actions/download-artifact` Action
+### 3. Official `actions/download-artifact` Action
 
 **Used in:** `deploy.yaml`
 
-**Purpose:** Downloads a file or collection of files previously uploaded by the upload artifact action, making them available to be used by a job within the current runner. In this repository, this action is used to download the tag artifact created in `build-and-push.yaml`, providing it as a configuration input for ECS so the ECS service pulls that image tag from ECR when starting tasks.
+**Purpose:** Downloads a file or collection of files previously uploaded by the upload artifact action, making them available to be used by a job within the current runner. In this repository, this action is used to download the tag artifact created in `build-and-push.yaml`, providing it as a configuration input for ECS, so that the ECS service can pull that image tag from ECR when starting tasks.
 
 **Alternatives:** `joutvhu/download-s3`. If uploading to AWS S3 had been used instead of the upload artifact action, this action allows you to download files from S3.
 
-### Unofficial `dorny/test-reporter` Action
+### 4. Unofficial `dorny/test-reporter` Action
 
 **Used in:** `ci-test.yaml`
 
@@ -310,15 +423,15 @@ Within the CI/CD workflows of this application, multiple third party actions fro
 
 **Alternatives:** `ctrf-io/github-test-reporter`. A solid alternative with a lot of configuration options, `dorny/test-reporter` was chosen instead as the more popular and mature option with clearer documentation and easy implementation.
 
-### Official `aws-actions/configure-aws-credentials` Action
+### 5. Official `aws-actions/configure-aws-credentials` Action
 
 **Used in:** `build-and-push.yaml`, `deploy.yaml`
 
-**Purpose:** Uses an AWS IAM Role or User to allow specified access to AWS account resources, within the workflow. Within my workflows this uses an access key, secret access key, and aws region variable stored within GitHub Secrets to configure permissions using specifically configured IAM User. Although using a Role here with rotating credentials is more secure and best practices, for the scope and security needs of this application, an IAM User was used instead to simplify this process.
+**Purpose:** Uses an AWS IAM Role or User to allow specified access to AWS account resources, within the workflow. Within my workflows this uses an access key, secret access key, and aws region variable stored within GitHub Secrets to configure permissions using an IAM User. Although using a Role here with rotating credentials is more secure and best practice, for the scope and security needs of this application, an IAM user was sufficient.
 
-**Alternatives:** `Moulick/configure-multiple-aws-roles`. This action is a wrapper of the official action that allows for configuration of concurrent AWS Roles within the same workflow. As this was not relevant or required for my use case, the original was used.
+**Alternatives:** `Moulick/configure-multiple-aws-roles`. This action is a wrapper of the official action, allowing for configuration of concurrent AWS Roles within the same workflow. As this was not relevant or required for my use case, the original was used.
 
-### Official `aws-actions/amazon-ecr-login` Action
+### 6. Official `aws-actions/amazon-ecr-login` Action
 
 **Used in:** `build-and-push.yaml`
 
@@ -326,7 +439,7 @@ Within the CI/CD workflows of this application, multiple third party actions fro
 
 **Alternatives:** `jwalton/gh-ecr-login`. This action is lacking in documentation, and with the very simple usage of the official action, there was no reason to choose an unofficial alternative.
 
-### Official `aws-actions/amazon-ecs-deploy-express-service` Action
+### 7. Official `aws-actions/amazon-ecs-deploy-express-service` Action
 
 **Used in:** `deploy.yaml`
 
