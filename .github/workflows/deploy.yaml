@@ -36,13 +36,14 @@ jobs:
             environment-variables: |
               [
                 {"name": "NODE_ENV", "value": "production"},
-                {"name": "TOKEN_HEADER_KEY", "value": "authorization"}
+                {"name": "TOKEN_HEADER_KEY", "value":"${{ vars.TOKEN_HEADER_KEY }}"}
               ]
+            # Vars used here resolve to ARN's so safe to use as vars not secrets
             secrets: |
               [
-                {"name": "DATABASE_URI", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/DATABASE_URI"},
-                {"name": "JWT_SECRET_KEY", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/JWT_SECRET_KEY"},
-                {"name": "OMDB_API_KEY", "valueFrom": "arn:aws:ssm:ap-southeast-2:954692413989:parameter/OMDB_API_KEY"}
+                {"name": "DATABASE_URI", "valueFrom": "${{ vars.SSM_DB_URI_ARN }}"},
+                {"name": "JWT_SECRET_KEY", "valueFrom": "${{ vars.SSM_JWT_KEY_ARN }}"},
+                {"name": "OMDB_API_KEY", "valueFrom": "${{ vars.SSM_OMDB_KEY_ARN }}"}
               ]
             memory: ${{ vars.BACKEND_MEMORY }}
             security-groups: ${{ vars.BACKEND_SECURITY_GROUPS }}
