@@ -6,54 +6,55 @@ The application is [deployed at this URL.](https://re-2b69362bbe8c493ea8c4cba2cf
 
 ### CI Tests Workflow
 
-![successful CI Tests workflow run](./images/ci-tests.png)
+_`ci-tests.yaml` workflow triggered by pull request, successfully passes and stores test reports as persistent artifact_
+![Ci-tests workflow triggered by pull request, passes, and produces artifacts](./images/ci-tests.png)
+
+_Test results are attached as a check run to the pull request_
+![Test results attached as PR check run](./images/check-run.png)
+
+_Formatted test report output_
+![Formatted test report output](./images/test-report.png)
 
 ### Build and Push Workflow
 
-![Successful Build and Push workflow run](./images/build-and-push.png)
+_`build-and-push.yaml` workflow triggered by git version update pushed to main, successfully passes and stores image tag as persistent artifact, using matrix to run concurrently_
+![Build-and-push workflow triggered by git version update pushed to main, successfully passes and stores image tag as persistent artifact](./images/build-and-push.png)
 
 ### Deploy Workflow
 
-![Successful Deploy Workflow Run](./images/deploy.png)
+_`deploy.yaml` workflow triggered from `build-and-push.yaml` workflow's successful completion, deploying to ECS using matrix to run concurrently._
+![Deploy workflow triggered from build-and-push workflow's successful completion, deploying to ECS](./images/deploy.png)
 
 ### GitHub Secrets
 
-![GitHub Secrets](./images/github-secrets.png)
+_Repository secrets stored in GitHub Secrets_
+![Repository secrets stored in GitHub Secrets](./images/repository_secrets.png)
 
 ## AWS Configuration
 
-### Running Cluster
+### Running ECS Cluster
 
-![reel-canon-cluster running on AWS](./images/deployed-cluster.png)
+_reel-canon-cluster running on AWS ECS_
+![reel-canon-cluster running on AWS ECS](./images/ecs-cluster.png)
 
 ### Running Services
 
+_Backend and frontend services running in the cluster_
 ![Backend and frontend services running in the cluster](./images/running-services.png)
-
-### Backend Service Configuration
-
-![Configuration of the backend service](./images/backend-service-config.png)
-
-### Frontend Service Configuration
-
-![Configuration of the frontend service](./images/frontend-service-configuration.png)
-
-### VPC Resource Map
-
-The private subnets and route table are not used in this application
-
-![VPC resource map](./images/vpc-resource-map.png)
 
 ### Images Stored and Pulled From ECR
 
-![Image stored in ECR](./images/ecr-backend-image.png)
+_Container images stored and pulled from ECR_
+![Container images stored and pulled from ECR](images/ecr-images.png)
 
 ## Website Function
 
-### ALB URL Shows Running Application
+### Frontend URL Shows Running Application
 
-![Running application](./images/running-application.png)
+_Frontend service shows running application_
+![Frontend service shows running application](./images/running-application.png)
 
 ### Persistent Data Loaded From Database
 
+_Application shows successful retrieval of database information, proving functional connection to backend service_
 ![Persistent Database Data](./images/website-loads-database.png)
