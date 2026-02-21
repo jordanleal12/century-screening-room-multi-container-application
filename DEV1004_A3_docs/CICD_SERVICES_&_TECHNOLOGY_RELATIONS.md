@@ -387,6 +387,51 @@ A container registry is required to store the service images that ECS uses to st
 
 ---
 
+## Nginx
+
+When the `build-and-push.yaml` builds the frontend service image to push to ECR, it uses the `frontend/Dockerfile.prod` file as a blueprint. This file is what is known as a multi-stage docker build. As the frontend container will be serving a compiled, static `index.html` file, a multi-stage build is used to create a final, optimized image, with Nginx Alpine as the base image and only containing the react build output.
+
+This is done by first running the frontend container, then executing a build command to create the compiled files, then create a new Nginx Alpine image base and copying across only the compiled files, keeping a lightweight image with only what's required.
+
+So what is Nginx and why is it needed? Our frontend service needs a way to 'serve' files to HTTP requests, aka a HTTP server. This frontend application is a React service built on Vite, which has this built in natively with the Vite development server. When the `npm run dev` command is run in the frontend development application, this starts the Vite server, quickly compiles the React code, and serves it to incoming requests, with 'hot reloading' enabling fast rebuilds during code changes.
+
+This is great for development, but this native Vite server is highly resource inefficient, using more memory, requiring an underlying Node environment, and dedicating resources to 'watching' the application for changes. This is where Nginx comes in. Nginx acts as an extremely lightweight, resource efficient HTTP server, serving the static compiled React application `index.html` file. For context, the development frontend image final size comes to 658.43 MB, with the Nginx Alpine based production image being only 94.51 MB.
+
+### Why Nginx?
+
+The most popular image base for serving static React applications is currently the alpine variant of the Nginx base image. It is not the only option however, with applications being able to run on the less efficient but very simple to use Node runtime, or the highly competitive Caddy and Apache httpd base images. The alpine variation (the most lightweight variant) of each base image will be compared below:
+
+|                            | **Nginx Alpine** | **Caddy Alpine** | **Apache httpd Alpine** | **Node Alpine** |
+| :------------------------: | :--------------: | :--------------: | :---------------------: | :-------------: |
+|       **Image Size**       |     24.7 MB      |     21.5 MB      |         19.9 MB         |     53.5 MB     |
+| **Performance Benchmarks** |      First       |      Second      |          Third          |      Last       |
+|     **Ease of Setup**      |       Easy       |       Easy       |         Medium          |    Very Easy    |
+|     **Documentation**      |       Best       |      Great       |          Great          |      Great      |
+
+1. **Image Size:**
+   Although each offering except for Node has an extremely optimized image size with only 5MB difference between them, Apache takes the win here with an impressive 19.9MB size.
+   \
+    **_Result:_** Nginx: 0 | Caddy: 0 | Apache: 1 | Node: 0
+   </br>
+2. **Performance Benchmarks:**
+   [This recent 2025 benchmark comparison](https://linuxconfig.org/ultimate-web-server-benchmark-apache-nginx-litespeed-openlitespeed-caddy-lighttpd-compared) compared all but Node for web server performance. As the least optimized option of the offerings here for serving static files, Node can comfortably be put in last place, despite not being directly compared here. For the remaining three, Nginx leads in overall web server performance, excelling in low latency, static file handling and file transfer rate. Caddy took second place here and Apache fell to last, struggling in high concurrency and sustained load tests.
+   \
+   **_Result:_** Nginx: 1 | Caddy: 0 | Apache: 1 | Node: 0
+   </br>
+3. **Ease of Setup:**
+   Although the least performance optimized, Node is undeniably the easiest to implement, with the `serve` package allowing for setup without any additional configuration files. Of the optimized offerings, Nginx and Caddy remain relatively simple, with a small and simple `nginx.conf` or `Caddyfile` able to handle static server setup. Apache setup is still fairly simple, but requires a little more complex and verbose configuration file.
+   \
+   **_Result:_** Nginx: 1 | Caddy: 0 | Apache: 1 | Node: 1
+   </br>
+4. **Documentation:**
+   Although Node leads in overall documentation, when it comes to specific use as a base image for a static server, it falls behind to Nginx. Documentation for Caddy and Apache remains excellent with plenty of additional community support, but as the most popular option with a huge user base, Nginx remains on top.
+   \
+   **_Result:_** Nginx: 2 | Caddy: 0 | Apache: 1 | Node: 0
+
+**Overall Result:** With its high performance, easy setup and rich community support, Nginx was the most appropriate HTTP server for my frontend service.
+
+---
+
 ## Marketplace Actions
 
 Within the CI/CD workflows of this application, multiple third party actions from the GitHub Actions Marketplace where used. Below I will list each action used and its purpose within the workflows.
