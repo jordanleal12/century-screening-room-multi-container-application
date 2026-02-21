@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository is a conversion of the existing ['Century Screening Room'](https://github.com/CoderAcademy-DEV-MERN-Group) full stack MERN project I previously worked on. The application was deployed to AWS ECS using the `aws-actions/amazon-ecs-deploy-express-service@v1` action, and combines a frontend React application and a backend API into a multi-container orchestrated deployment.
+This repository is a conversion of the existing ['Century Screening Room'](https://github.com/CoderAcademy-DEV-MERN-Group) full stack MERN project I previously worked on. The application was deployed to AWS ECS using the `aws-actions/amazon-ecs-deploy-express-service@v1` action, and combines a frontend React application and a backend Express API into a multi-container orchestrated deployment.
 
 For detailed documentation on the individual applications, see:
 
