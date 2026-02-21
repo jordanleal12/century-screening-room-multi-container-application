@@ -4,10 +4,22 @@
 
 This repository is a conversion of the existing ['Century Screening Room'](https://github.com/CoderAcademy-DEV-MERN-Group) full stack MERN project I previously worked on. The application was deployed to AWS ECS using the `aws-actions/amazon-ecs-deploy-express-service@v1` action, and combines a frontend React application and a backend Express API into a multi-container orchestrated deployment.
 
-For detailed documentation on the individual applications, see:
+**For detailed documentation on the individual applications, see:**
 
 - [Backend Documentation](./backend/README.md)
 - [Frontend Documentation](./frontend/README.md)
+
+**For documentation specific to DEV1004 Assessment 01 - Containerise an Existing Application, see:**
+
+- [Planning & Architecture](./DEV1004_A1_docs/PLANNING_AND_ARCHITECTURE.md)
+- [Proof of Deployment](./DEV1004_A1_docs/PROOF_OF_DEPLOYMENT.md)
+
+**For documentation specific to DEV1004 Assessment 03 - Develop a CI/CD Pipeline, see:**
+
+- [Rubric Requirements](./DEV1004_A3_docs/RUBRIC_REQUIREMENTS.md) (Entry point, explains where each rubric item is addressed).
+- [Workflows Explained](./DEV1004_A3_docs/WORKFLOWS_EXPLAINED.md)
+- [CI/CD Services & Technology Relations](./DEV1004_A3_docs/CICD_SERVICES_&_TECHNOLOGY_RELATIONS.md)
+- [Proof of Deployment](./DEV1004_A3_docs/PROOF_OF_DEPLOYMENT.md)
 
 ---
 
